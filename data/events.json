@@ -1,0 +1,315 @@
+[
+  {
+    "id": "poor_harvest",
+    "name": "The Failing Harvest",
+    "text": "A poor harvest has left the granaries dangerously low.",
+    "choices": [
+      {
+        "id": "raise_taxes",
+        "label": "Raise taxes",
+        "effects": {
+          "prosperity": 10,
+          "happiness": -15,
+          "loyalty": -5,
+          "treasury": 120
+        },
+        "unlocks": ["tax_protests"]
+      },
+      {
+        "id": "ration_food",
+        "label": "Introduce rationing",
+        "effects": {
+          "happiness": -5,
+          "loyalty": 5,
+          "treasury": -40
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "tax_protests",
+    "name": "Popular Unrest",
+    "text": "Protests erupt over increased taxation.",
+    "requirements": {
+      "eventsSeen": ["poor_harvest"],
+      "stats": { "happiness": { "lte": 40 } }
+    },
+    "choices": [
+      {
+        "id": "crack_down",
+        "label": "Crack down",
+        "effects": {
+          "loyalty": 10,
+          "happiness": -15,
+          "treasury": 30
+        }
+      },
+      {
+        "id": "concede",
+        "label": "Concede to demands",
+        "effects": {
+          "prosperity": -10,
+          "happiness": 10,
+          "treasury": -20
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "plague",
+    "name": "The Plague",
+    "text": "A deadly plague spreads through the countryside.",
+    "requirements": {
+      "stats": { "prosperity": { "lte": 50 } }
+    },
+    "choices": [
+      {
+        "id": "fund_aid",
+        "label": "Fund aid efforts",
+        "effects": {
+          "prosperity": -15,
+          "happiness": 10
+        }
+      },
+      {
+        "id": "do_nothing",
+        "label": "Do nothing",
+        "effects": {
+          "happiness": -15,
+          "loyalty": -5
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "rebellion",
+    "name": "The Noble's Conspiracy",
+    "text": "The nobles are plotting a rebellion against your rule!",
+    "requirements": {
+      "stats": { "loyalty": { "lte": 30 } }
+    },
+    "choices": [
+      {
+        "id": "crush_rebellion",
+        "label": "Crush the rebellion",
+        "effects": {
+          "loyalty": -30,
+          "prosperity": 10,
+          "happiness": -40
+        }
+      },
+      {
+        "id": "negotiate_rebellion",
+        "label": "Negotiate with rebels",
+        "effects": {
+          "loyalty": 15,
+          "prosperity": -20,
+          "happiness": 10
+        },
+        "unlocks": ["peace_treaty"]
+      }
+    ]
+  },
+
+  {
+    "id": "peace_treaty",
+    "name": "Diplomatic Negotiations",
+    "text": "Foreign diplomats arrive to negotiate a peace treaty.",
+    "requirements": {
+      "eventsSeen": ["rebellion"],
+      "stats": { "loyalty": { "gte": 20 } }
+    },
+    "choices": [
+      {
+        "id": "sign_treaty",
+        "label": "Sign the treaty",
+        "effects": {
+          "prosperity": 20,
+          "happiness": 15,
+          "loyalty": 10
+        }
+      },
+      {
+        "id": "reject_treaty",
+        "label": "Reject the treaty",
+        "effects": {
+          "prosperity": -30,
+          "happiness": -20,
+          "loyalty": -15
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "trade_dispute",
+    "name": "The Merchant's Quarrel",
+    "text": "Merchants are quarreling over trading rights in the kingdom.",
+    "choices": [
+      {
+        "id": "merchant_subsidy",
+        "label": "Subsidize merchants",
+        "effects": {
+          "prosperity": 15,
+          "happiness": 10,
+          "loyalty": -5
+        }
+      },
+      {
+        "id": "impose_tariffs",
+        "label": "Impose heavy tariffs",
+        "effects": {
+          "prosperity": -10,
+          "happiness": -10,
+          "loyalty": 5
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "dragon_attack",
+    "name": "The Dragon",
+    "text": "A fearsome dragon has been spotted near the kingdom!",
+    "requirements": {
+      "stats": { "prosperity": { "gte": 40 } }
+    },
+    "choices": [
+      {
+        "id": "hire_adventurers",
+        "label": "Hire adventurers to slay it",
+        "effects": {
+          "prosperity": -25,
+          "happiness": 25,
+          "loyalty": 20
+        }
+      },
+      {
+        "id": "sacrifice_tribute",
+        "label": "Offer it tribute",
+        "effects": {
+          "prosperity": -15,
+          "happiness": -30,
+          "loyalty": -10
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "royal_marriage",
+    "name": "A Royal Union",
+    "text": "An opportunity for a royal marriage alliance has appeared.",
+    "choices": [
+      {
+        "id": "arrange_marriage",
+        "label": "Arrange the marriage",
+        "effects": {
+          "prosperity": 20,
+          "happiness": 5,
+          "loyalty": 15
+        },
+        "unlocks": ["allied_kingdom"]
+      },
+      {
+        "id": "decline_marriage",
+        "label": "Decline politely",
+        "effects": {
+          "loyalty": -5,
+          "happiness": 0,
+          "prosperity": -5
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "allied_kingdom",
+    "name": "Allies Offer Aid",
+    "text": "Your new allies offer military support in troubled times.",
+    "requirements": {
+      "eventsSeen": ["royal_marriage"]
+    },
+    "choices": [
+      {
+        "id": "accept_alliance",
+        "label": "Accept their support",
+        "effects": {
+          "loyalty": 15,
+          "happiness": 10,
+          "prosperity": 10
+        }
+      },
+      {
+        "id": "remain_independent",
+        "label": "Maintain independence",
+        "effects": {
+          "loyalty": -5,
+          "happiness": 5,
+          "prosperity": 0
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "assassin_plot",
+    "name": "Betrayal Within",
+    "text": "An assassination plot against you has been uncovered!",
+    "requirements": {
+      "stats": { "loyalty": { "lte": 45 } }
+    },
+    "choices": [
+      {
+        "id": "execute_conspirators",
+        "label": "Execute the conspirators",
+        "effects": {
+          "loyalty": 5,
+          "happiness": -25,
+          "prosperity": -10
+        }
+      },
+      {
+        "id": "pardon_conspirators",
+        "label": "Pardon them and investigate",
+        "effects": {
+          "loyalty": -15,
+          "happiness": 10,
+          "prosperity": -5
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "golden_harvest",
+    "name": "Bountiful Years",
+    "text": "The finest harvest in a generation blesses the kingdom!",
+    "requirements": {
+      "stats": { "prosperity": { "gte": 60 } }
+    },
+    "choices": [
+      {
+        "id": "celebrate_harvest",
+        "label": "Celebrate with festivals",
+        "effects": {
+          "happiness": 30,
+          "loyalty": 20,
+          "prosperity": -10
+        }
+      },
+      {
+        "id": "stockpile_grain",
+        "label": "Stockpile for future shortages",
+        "effects": {
+          "happiness": 5,
+          "loyalty": 10,
+          "prosperity": 15
+        }
+      }
+    ]
+  }
+]

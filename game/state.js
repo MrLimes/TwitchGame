@@ -1,16 +1,20 @@
 export const state = {
-  age: 30,
+  rulerName: "Ruler",
+  rulerTitle: "King",
+  age: 18,
   stats: {
     happiness: 50,
     prosperity: 50,
     loyalty: 50,
-    treasury: 1000
+    treasury: 150
   },
   votes: [0, 0],
   currentEvent: null,
   seenEvents: new Set(),
-  unlockedEvents: new Set(),
+  choicesMade: new Set(),
   gameOver: false,
-  history: []
+  history: [],
+  followUpQueue: [],
+  activeModifiers: []
 };
 ``

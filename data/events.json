@@ -3,6 +3,10 @@
     "id": "poor_harvest",
     "name": "The Failing Harvest",
     "text": "A poor harvest has left the granaries dangerously low.",
+    "image": "🌾",
+    "tags": ["economic", "crisis"],
+    "weight": 1.0,
+    "repeatable": false,
     "choices": [
       {
         "id": "raise_taxes",
@@ -13,7 +17,7 @@
           "loyalty": -5,
           "treasury": 120
         },
-        "unlocks": ["tax_protests"]
+        "applyModifiers": ["drought"]
       },
       {
         "id": "ration_food",
@@ -31,8 +35,12 @@
     "id": "tax_protests",
     "name": "Popular Unrest",
     "text": "Protests erupt over increased taxation.",
+    "image": "✊",
+    "tags": ["political", "crisis"],
+    "weight": 1.0,
+    "repeatable": false,
     "requirements": {
-      "eventsSeen": ["poor_harvest"],
+      "choicesMade": ["raise_taxes"],
       "stats": { "happiness": { "lte": 40 } }
     },
     "choices": [
@@ -61,6 +69,10 @@
     "id": "plague",
     "name": "The Plague",
     "text": "A deadly plague spreads through the countryside.",
+    "image": "💀",
+    "tags": ["crisis", "health"],
+    "weight": 0.8,
+    "repeatable": false,
     "requirements": {
       "stats": { "prosperity": { "lte": 50 } }
     },
@@ -70,7 +82,8 @@
         "label": "Fund aid efforts",
         "effects": {
           "prosperity": -15,
-          "happiness": 10
+          "happiness": 10,
+          "treasury": 17
         }
       },
       {
@@ -88,6 +101,10 @@
     "id": "rebellion",
     "name": "The Noble's Conspiracy",
     "text": "The nobles are plotting a rebellion against your rule!",
+    "image": "⚔️",
+    "tags": ["military", "crisis"],
+    "weight": 0.9,
+    "repeatable": false,
     "requirements": {
       "stats": { "loyalty": { "lte": 30 } }
     },
@@ -99,7 +116,8 @@
           "loyalty": -30,
           "prosperity": 10,
           "happiness": -40
-        }
+        },
+        "applyModifiers": ["war_tax"]
       },
       {
         "id": "negotiate_rebellion",
@@ -109,7 +127,7 @@
           "prosperity": -20,
           "happiness": 10
         },
-        "unlocks": ["peace_treaty"]
+        "followUp": "peace_treaty"
       }
     ]
   },
@@ -118,8 +136,12 @@
     "id": "peace_treaty",
     "name": "Diplomatic Negotiations",
     "text": "Foreign diplomats arrive to negotiate a peace treaty.",
+    "image": "🕊️",
+    "tags": ["diplomatic", "positive"],
+    "weight": 1.0,
+    "repeatable": false,
     "requirements": {
-      "eventsSeen": ["rebellion"],
+      "choicesMade": ["negotiate_rebellion"],
       "stats": { "loyalty": { "gte": 20 } }
     },
     "choices": [
@@ -148,6 +170,10 @@
     "id": "trade_dispute",
     "name": "The Merchant's Quarrel",
     "text": "Merchants are quarreling over trading rights in the kingdom.",
+    "image": "⚖️",
+    "tags": ["economic"],
+    "weight": 1.2,
+    "repeatable": false,
     "choices": [
       {
         "id": "merchant_subsidy",
@@ -156,7 +182,8 @@
           "prosperity": 15,
           "happiness": 10,
           "loyalty": -5
-        }
+        },
+        "applyModifiers": ["trade_boom"]
       },
       {
         "id": "impose_tariffs",
@@ -174,6 +201,10 @@
     "id": "dragon_attack",
     "name": "The Dragon",
     "text": "A fearsome dragon has been spotted near the kingdom!",
+    "image": "🐉",
+    "tags": ["military", "fantasy"],
+    "weight": 0.7,
+    "repeatable": false,
     "requirements": {
       "stats": { "prosperity": { "gte": 40 } }
     },
@@ -203,6 +234,10 @@
     "id": "royal_marriage",
     "name": "A Royal Union",
     "text": "An opportunity for a royal marriage alliance has appeared.",
+    "image": "💍",
+    "tags": ["diplomatic", "positive"],
+    "weight": 1.0,
+    "repeatable": false,
     "choices": [
       {
         "id": "arrange_marriage",
@@ -212,7 +247,7 @@
           "happiness": 5,
           "loyalty": 15
         },
-        "unlocks": ["allied_kingdom"]
+        "followUp": "allied_kingdom"
       },
       {
         "id": "decline_marriage",
@@ -230,8 +265,12 @@
     "id": "allied_kingdom",
     "name": "Allies Offer Aid",
     "text": "Your new allies offer military support in troubled times.",
+    "image": "🤝",
+    "tags": ["diplomatic", "positive"],
+    "weight": 1.0,
+    "repeatable": false,
     "requirements": {
-      "eventsSeen": ["royal_marriage"]
+      "choicesMade": ["arrange_marriage"]
     },
     "choices": [
       {
@@ -259,6 +298,10 @@
     "id": "assassin_plot",
     "name": "Betrayal Within",
     "text": "An assassination plot against you has been uncovered!",
+    "image": "🗡️",
+    "tags": ["political", "crisis"],
+    "weight": 0.9,
+    "repeatable": false,
     "requirements": {
       "stats": { "loyalty": { "lte": 45 } }
     },
@@ -288,6 +331,10 @@
     "id": "golden_harvest",
     "name": "Bountiful Years",
     "text": "The finest harvest in a generation blesses the kingdom!",
+    "image": "🌻",
+    "tags": ["economic", "positive"],
+    "weight": 0.8,
+    "repeatable": false,
     "requirements": {
       "stats": { "prosperity": { "gte": 60 } }
     },
@@ -299,7 +346,8 @@
           "happiness": 30,
           "loyalty": 20,
           "prosperity": -10
-        }
+        },
+        "applyModifiers": ["festival_spirit"]
       },
       {
         "id": "stockpile_grain",

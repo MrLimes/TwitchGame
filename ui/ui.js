@@ -14,45 +14,64 @@ export function renderState(state) {
   }
 }
 
+let showEffectNumbers = false;
+
+export function toggleEffectNumbers() {
+  showEffectNumbers = !showEffectNumbers;
+  return showEffectNumbers;
+}
+
+function fmt(val) {
+  return val > 0 ? `(+${val})` : `(${val})`;
+}
+
 function getEffectIndicators(effects) {
   const indicators = [];
-  
-  if (effects.happiness > 0) indicators.push("↑😊");
-  if (effects.happiness < 0) indicators.push("↓😔");
-  
-  if (effects.prosperity > 0) indicators.push("↑💰");
-  if (effects.prosperity < 0) indicators.push("↓📉");
-  
-  if (effects.loyalty > 0) indicators.push("↑👑");
-  if (effects.loyalty < 0) indicators.push("↓💔");
-  
-  if (effects.treasury > 0) indicators.push("↑💷");
-  if (effects.treasury < 0) indicators.push("↓💷");
+
+  if (effects.happiness > 0) indicators.push(showEffectNumbers ? `↑😊${fmt(effects.happiness)}` : "↑😊");
+  if (effects.happiness < 0) indicators.push(showEffectNumbers ? `↓😔${fmt(effects.happiness)}` : "↓😔");
+
+  if (effects.prosperity > 0) indicators.push(showEffectNumbers ? `↑💰${fmt(effects.prosperity)}` : "↑💰");
+  if (effects.prosperity < 0) indicators.push(showEffectNumbers ? `↓📉${fmt(effects.prosperity)}` : "↓📉");
+
+  if (effects.loyalty > 0) indicators.push(showEffectNumbers ? `↑👑${fmt(effects.loyalty)}` : "↑👑");
+  if (effects.loyalty < 0) indicators.push(showEffectNumbers ? `↓💔${fmt(effects.loyalty)}` : "↓💔");
+
+  if (effects.treasury > 0) indicators.push(showEffectNumbers ? `↑💷${fmt(effects.treasury)}` : "↑💷");
+  if (effects.treasury < 0) indicators.push(showEffectNumbers ? `↓💷${fmt(effects.treasury)}` : "↓💷");
 
   return indicators;
+}
+
+export function updateKingIndicators(effectsA, effectsB) {
+  document.getElementById("kingA-indicators").textContent = getEffectIndicators(effectsA).join(" ");
+  document.getElementById("kingB-indicators").textContent = getEffectIndicators(effectsB).join(" ");
 }
 
 export function renderEvent(event) {
   document.getElementById("eventName").textContent = event.name;
   document.getElementById("eventText").textContent = event.text;
 
+  const imageEl = document.getElementById("eventCardImage");
+  if (event.image && (event.image.startsWith("http") || event.image.startsWith("/"))) {
+    imageEl.innerHTML = `<img src="${event.image}" alt="${event.name}" />`;
+  } else {
+    imageEl.textContent = event.image ?? "🏰";
+  }
+
   const choiceA = event.choices[0];
   const choiceB = event.choices[1];
-  
+
   const indicatorsA = getEffectIndicators(choiceA.effects);
   const indicatorsB = getEffectIndicators(choiceB.effects);
 
-  // Vote cards
   document.getElementById("voteA-title").textContent = choiceA.label;
   document.getElementById("voteA-indicators").textContent = indicatorsA.join(" ");
-  
   document.getElementById("voteB-title").textContent = choiceB.label;
   document.getElementById("voteB-indicators").textContent = indicatorsB.join(" ");
 
-  // King cards
   document.getElementById("kingA-title").textContent = choiceA.label;
   document.getElementById("kingA-indicators").textContent = indicatorsA.join(" ");
-  
   document.getElementById("kingB-title").textContent = choiceB.label;
   document.getElementById("kingB-indicators").textContent = indicatorsB.join(" ");
 }
@@ -75,7 +94,7 @@ export function renderHistory(history) {
     return;
   }
 
-  history.forEach((entry, index) => {
+  [...history].reverse().forEach((entry) => {
     const historyItem = document.createElement("div");
     historyItem.className = "history-item";
     
@@ -91,6 +110,11 @@ export function renderHistory(history) {
         </div>
         <div class="history-choice">→ ${entry.choiceLabel}</div>
         <div class="history-effects">${effectsText}</div>
+        ${entry.modifiers && entry.modifiers.length > 0 ? `<div class="history-modifiers">${entry.modifiers.map(m => {
+          const sign = m.amount > 0 ? "+" : "";
+          const dur = m.duration === null ? "permanent" : `${m.duration} rounds`;
+          return `${m.icon} ${m.label}: ${m.stat} ${sign}${m.amount} for ${dur}`;
+        }).join(" · ")}</div>` : ""}
       </div>
     `;
     historyContainer.appendChild(historyItem);
@@ -98,10 +122,13 @@ export function renderHistory(history) {
 }
 
 export function showGameOver(reason, state) {
-  document.getElementById("gameOverText").textContent = reason;
+  document.getElementById("gameOverText").textContent = `${state.rulerTitle} ${state.rulerName} — ${reason}`;
   document.getElementById("finalTreasury").textContent = state.stats.treasury;
+  document.getElementById("finalHappiness").textContent = state.stats.happiness;
+  document.getElementById("finalProsperity").textContent = state.stats.prosperity;
+  document.getElementById("finalLoyalty").textContent = state.stats.loyalty;
 
-  document.querySelectorAll(".card-button, #hackHappinessBtn").forEach((btn) => {
+  document.querySelectorAll(".card-button, #hackHappinessBtn, #hackLoyaltyBtn").forEach((btn) => {
     btn.style.pointerEvents = "none";
     btn.style.opacity = "0.5";
   });
@@ -109,12 +136,71 @@ export function showGameOver(reason, state) {
   document.getElementById("gameOverScreen").style.display = "flex";
 }
 
+export function renderModifiers(activeModifiers) {
+  const section = document.getElementById("activeModifiersSection");
+  const container = document.getElementById("activeModifiers");
+
+  if (!activeModifiers || activeModifiers.length === 0) {
+    section.style.display = "none";
+    return;
+  }
+
+  section.style.display = "block";
+  container.innerHTML = activeModifiers.map(m => {
+    const sign = m.amount > 0 ? "+" : "";
+    const dur = m.duration === null ? "permanent" : `${m.duration} round${m.duration === 1 ? "" : "s"} left`;
+    return `<span class="modifier-tag">${m.icon} ${m.label}: ${m.stat} ${sign}${m.amount} (${dur})</span>`;
+  }).join("");
+}
+
+export function updateTimer(seconds) {
+  const el = document.getElementById("voteTimer");
+  if (seconds > 0) {
+    el.textContent = `⏳ ${seconds}s`;
+    el.style.color = seconds <= 5 ? "#ff5722" : "#ffd700";
+  } else {
+    el.textContent = "";
+  }
+}
+
+export function setVotingPhase(active, votes) {
+  const voteCardA = document.getElementById("voteCardA");
+  const voteCardB = document.getElementById("voteCardB");
+  const kingCardA = document.getElementById("kingCardA");
+  const kingCardB = document.getElementById("kingCardB");
+  const kingSection = document.getElementById("kingSection");
+
+  voteCardA.style.pointerEvents = active ? "auto" : "none";
+  voteCardB.style.pointerEvents = active ? "auto" : "none";
+  voteCardA.style.opacity = active ? "1" : "0.5";
+  voteCardB.style.opacity = active ? "1" : "0.5";
+
+  kingSection.style.opacity = active ? "0.3" : "1";
+  kingCardA.style.pointerEvents = active ? "none" : "auto";
+  kingCardB.style.pointerEvents = active ? "none" : "auto";
+
+  if (!active) {
+    const total = votes[0] + votes[1];
+    const pctA = total > 0 ? Math.round(votes[0] / total * 100) : 50;
+    const pctB = 100 - pctA;
+
+    document.getElementById("voteA-indicators").textContent = `👥 ${pctA}%`;
+    document.getElementById("voteB-indicators").textContent = `👥 ${pctB}%`;
+
+    const effectsA = document.getElementById("kingA-indicators").textContent;
+    const effectsB = document.getElementById("kingB-indicators").textContent;
+    document.getElementById("kingA-indicators").textContent = `👥 ${pctA}%  ${effectsA}`;
+    document.getElementById("kingB-indicators").textContent = `👥 ${pctB}%  ${effectsB}`;
+  }
+}
+
 export function resetGameUI() {
-  document.querySelectorAll(".card-button, #hackHappinessBtn").forEach((btn) => {
+  document.querySelectorAll(".card-button, #hackHappinessBtn, #hackLoyaltyBtn").forEach((btn) => {
     btn.style.pointerEvents = "auto";
     btn.style.opacity = "1";
   });
 
+  renderModifiers([]);
   document.getElementById("gameOverScreen").style.display = "none";
   document.getElementById("gameOverText").textContent = "";
 }

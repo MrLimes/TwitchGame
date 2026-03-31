@@ -1,24 +1,12 @@
 import { state } from "./state.js";
-import { applyEffects, calculateDefiancePenalty, checkEndConditions, tickModifiers, activateModifiers, getVoteMultiplier } from "./rules.js";
-import { renderState, renderEvent, renderVotes, log, showGameOver, renderHistory, resetGameUI, setVotingPhase, updateTimer, renderModifiers, toggleEffectNumbers } from "../ui/ui.js";
+import { applyEffects, calculateDefiancePenalty, checkEndConditions, tickModifiers, activateModifiers, getVoteMultiplier, applyTagBoosts } from "./rules.js";
+import { renderState, renderEvent, renderVotes, log, showGameOver, renderHistory, resetGameUI, setVotingPhase, updateTimer, renderModifiers, updateKingIndicators } from "../ui/ui.js";
 import { resolveNextEvent, queueFollowUp } from "./eventManager.js";
+import { initDebug, rebuildEventSelect } from "./debug.js";
+import { saveLineage, loadLineage, clearLineage, ordinal, stripOrdinal } from "./save.js";
 
 let events = [];
 let modifierDefs = [];
-
-function rebuildEventSelect() {
-  const hackEventSelect = document.getElementById("hackEventSelect");
-  if (!hackEventSelect) return;
-  const current = hackEventSelect.value;
-  hackEventSelect.innerHTML = "";
-  events.forEach(e => {
-    const opt = document.createElement("option");
-    opt.value = e.id;
-    opt.textContent = state.seenEvents.has(e.id) ? `${e.name} ✓` : e.name;
-    hackEventSelect.appendChild(opt);
-  });
-  hackEventSelect.value = current || events[0]?.id;
-}
 let votingActive = false;
 let votingTimerId = null;
 let votingTimeLeft = 30;
@@ -34,8 +22,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.voteCardClick = (choice) => vote(choice);
   window.decideCardClick = (choice) => decide(choice);
 
-  const kingNames = ["Edward", "Henry", "Richard", "William", "Arthur", "Edmund", "Alfred", "Emil", "Harold", "Geoffrey", "Roland", "Leopold", "Magnus", "Aldric", "Conrad", "Sigurd"];
-  const queenNames = ["Eleanor", "Margaret", "Isabella", "Catherine", "Matilda", "Adelaide", "Josse", "Astrid", "Beatrice", "Cecily", "Elspeth", "Guinevere", "Hildegard", "Isolde", "Rowena", "Seraphina", "Vivienne"];
+  const kingNames = ["Neil", "Jonas", "Elias", "Kaka", "Harry", "Richard", "Sergei", "Julian", "Harold", "Geoffrey", "Roland", "Leopold", "Magnus", "Aldric", "Conrad", "Sigurd"];
+  const queenNames = ["Eleanor", "Margaret", "Isabella", "Lily", "Vilma", "Adelaide", "Josse", "Astrid", "Beatrice", "Cecily", "Elspeth", "Guinevere", "Hildegard", "Isolde", "Rowena", "Seraphina", "Vivienne"];
 
   document.getElementById("randomNameBtn").onclick = () => {
     const title = document.querySelector(".gender-option.selected")?.dataset.value ?? "King";
@@ -51,82 +39,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   });
 
-  document.getElementById("startBtn").onclick = () => beginReign();
+  document.getElementById("startBtn").onclick = () => beginReign(loadLineage());
+
+  const BRIBE_COST = 50;
+  const BRIBE_BOOST = 5;
+  function bribe(stat, label) {
+    if (state.gameOver || state.stats.treasury < BRIBE_COST) return;
+    state.stats.treasury -= BRIBE_COST;
+    state.stats[stat] = Math.min(100, state.stats[stat] + BRIBE_BOOST);
+    renderState(state);
+    log(`The King spends 🪙${BRIBE_COST} to boost ${label} by ${BRIBE_BOOST}.`);
+  }
+  document.getElementById("bribeHappinessBtn").onclick = () => bribe("happiness", "Happiness");
+  document.getElementById("bribeProsperityBtn").onclick = () => bribe("prosperity", "Prosperity");
+  document.getElementById("bribeLoyaltyBtn").onclick = () => bribe("loyalty", "Loyalty");
 
   document.getElementById("restartBtn").onclick = () => {
+    clearLineage();
+    document.getElementById("heirNotice").style.display = "none";
+    document.getElementById("rulerName").value = "";
     document.getElementById("gameOverScreen").style.display = "none";
     document.getElementById("startScreen").style.display = "flex";
   };
 
-  document.getElementById("hackHappinessBtn").onclick = () => {
-    state.stats.happiness = Math.max(0, state.stats.happiness - 10);
-    renderState(state);
-    log("Debug: happiness decreased by 10.");
-    const endReason = checkEndConditions(state);
-    if (endReason) { endVotingPhase(); showGameOver(endReason, state); state.gameOver = true; }
+  document.getElementById("heirBtn").onclick = () => {
+    const lineage = {
+      baseName: stripOrdinal(state.rulerName),
+      generation: (loadLineage()?.generation ?? 1) + 1,
+      treasury: state.stats.treasury,
+      permanentModifiers: state.activeModifiers.filter(m => m.duration === null)
+    };
+    saveLineage(lineage);
+
+    const heirName = `${lineage.baseName} ${ordinal(lineage.generation)}`;
+    document.getElementById("rulerName").value = heirName;
+
+    const notice = document.getElementById("heirNotice");
+    const modCount = lineage.permanentModifiers.length;
+    notice.textContent = `Heir to the throne. Inherits £${lineage.treasury}${modCount > 0 ? ` and ${modCount} permanent effect${modCount > 1 ? "s" : ""}` : ""}.`;
+    notice.style.display = "block";
+
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
   };
 
-  document.getElementById("hackLoyaltyBtn").onclick = () => {
-    state.stats.loyalty = 0;
-    renderState(state);
-    log("Debug: loyalty set to 0.");
-    const endReason = checkEndConditions(state);
-    if (endReason) { endVotingPhase(); showGameOver(endReason, state); state.gameOver = true; }
-  };
-
-  const hackEventSelect = document.getElementById("hackEventSelect");
-
-  rebuildEventSelect();
-  document.getElementById("debugPanel").addEventListener("toggle", () => {
-    if (document.getElementById("debugPanel").open) rebuildEventSelect();
-  });
-
-  document.getElementById("hackEffectNumbersBtn").onclick = () => {
-    const on = toggleEffectNumbers();
-    document.getElementById("hackEffectNumbersBtn").textContent = on ? "Hide effect numbers" : "Show effect numbers";
-    if (state.currentEvent) renderEvent(state.currentEvent);
-  };
-
-  document.getElementById("hackAddModifierBtn").onclick = () => {
-    if (!modifierDefs.length) return;
-    const def = modifierDefs[Math.floor(Math.random() * modifierDefs.length)];
-    state.activeModifiers.push({ ...def });
-    renderModifiers(state.activeModifiers);
-    log(`Debug: added modifier "${def.label}".`);
-  };
-
-  document.getElementById("hackClearModifiersBtn").onclick = () => {
-    state.activeModifiers = [];
-    renderModifiers(state.activeModifiers);
-    log("Debug: all modifiers cleared.");
-  };
-
-  document.getElementById("hackEventBtn").onclick = () => {
-    if (state.gameOver) return;
-    const selected = events.find(e => e.id === hackEventSelect.value);
-    if (!selected) return;
-    endVotingPhase();
-    state.votes = [0, 0];
-    state.currentEvent = selected;
-    renderEvent(selected);
-    renderVotes(state.votes);
-    renderState(state);
-    log(`Debug: forced event "${selected.name}".`);
-    startVotingPhase();
-  };
-
-  document.getElementById("hackVotesBtn").onclick = () => {
-    if (state.gameOver) return;
-    const a = Math.floor(Math.random() * 51);
-    state.votes[0] += a;
-    state.votes[1] += (50 - a);
-    renderVotes(state.votes);
-    if (votingActive) endVotingPhase();
-  };
-
+  initDebug({ events, modifierDefs, endVotingPhase, startVotingPhase });
 });
 
-function beginReign() {
+function beginReign(heirData = null) {
   const name = document.getElementById("rulerName").value.trim() || "Ruler";
   const title = document.querySelector(".gender-option.selected").dataset.value;
   const age = parseInt(document.getElementById("rulerAge").value, 10) || 18;
@@ -137,7 +97,7 @@ function beginReign() {
   state.stats.happiness = 50;
   state.stats.prosperity = 50;
   state.stats.loyalty = 50;
-  state.stats.treasury = 150;
+  state.stats.treasury = heirData ? heirData.treasury : 150;
   state.votes = [0, 0];
   state.currentEvent = null;
   state.seenEvents = new Set();
@@ -145,7 +105,9 @@ function beginReign() {
   state.gameOver = false;
   state.history = [];
   state.followUpQueue = [];
-  state.activeModifiers = [];
+  state.activeModifiers = heirData ? heirData.permanentModifiers.map(m => ({ ...m })) : [];
+
+  document.getElementById("heirNotice").style.display = "none";
 
   clearInterval(votingTimerId);
   votingTimerId = null;
@@ -193,11 +155,29 @@ function startVotingPhase() {
   }, 1000);
 }
 
+function scaleEffects(effects, event, voteMultiplier) {
+  const boosted = applyTagBoosts(effects, event, state.activeModifiers);
+  const scaled = {};
+  for (const key in boosted) {
+    scaled[key] = key === "treasury" ? boosted[key] : Math.round(boosted[key] * voteMultiplier);
+  }
+  return scaled;
+}
+
 function endVotingPhase() {
   if (!votingActive && votingTimerId === null) return;
   clearInterval(votingTimerId);
   votingTimerId = null;
   votingActive = false;
+
+  if (state.currentEvent) {
+    const choices = state.currentEvent.choices;
+    updateKingIndicators(
+      scaleEffects(choices[0].effects, state.currentEvent, getVoteMultiplier(state.votes, 0)),
+      scaleEffects(choices[1].effects, state.currentEvent, getVoteMultiplier(state.votes, 1))
+    );
+  }
+
   setVotingPhase(false, state.votes);
   updateTimer(0);
   log("Voting closed. The King must decide.");
@@ -218,16 +198,17 @@ function decide(choice) {
   state.seenEvents.add(event.id);
   state.choicesMade.add(selected.id);
   const voteMultiplier = getVoteMultiplier(state.votes, choice);
+  const boostedEffects = applyTagBoosts(selected.effects, event, state.activeModifiers);
 
-  // Build the actual applied effects (with vote multiplier)
+  // Build the actual applied effects (with tag boosts and vote multiplier)
   const appliedEffects = {};
-  for (const key in selected.effects) {
+  for (const key in boostedEffects) {
     const isPermanent = key === "treasury";
     appliedEffects[key] = isPermanent
-      ? selected.effects[key]
-      : Math.round(selected.effects[key] * voteMultiplier);
+      ? boostedEffects[key]
+      : Math.round(boostedEffects[key] * voteMultiplier);
   }
-  applyEffects(state.stats, selected.effects, voteMultiplier);
+  applyEffects(state.stats, boostedEffects, voteMultiplier);
 
   if (selected.followUp) queueFollowUp(state, selected.followUp);
   activateModifiers(selected, modifierDefs, state);
@@ -261,7 +242,7 @@ function decide(choice) {
   state.age++;
   renderState(state);
   renderHistory(state.history);
-  rebuildEventSelect();
+  rebuildEventSelect(events);
 
   const endReason = checkEndConditions(state);
   if (endReason) {

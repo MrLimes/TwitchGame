@@ -328,6 +328,66 @@
   },
 
   {
+    "id": "emils_test",
+    "name": "Emil is doing a test v1",
+    "text": "Emil is trying various thingas to test the game, this is one of them.",
+    "image": "🧪",
+    "tags": ["test", "crisis"],
+    "weight": 0.9,
+    "repeatable": false,
+    "choices": [
+      {
+        "id": "execute_test",
+        "label": "Execute the test. This will have no effect on the game, it's just for testing purposes.",
+        "effects": {
+          "loyalty": 0,
+          "happiness": 0,
+          "prosperity": 0
+        }
+      },
+      {
+        "id": "Ignore_test",
+        "label": "Ignoring the test will result in the death of the king",
+        "effects": {
+          "loyalty": -150,
+          "happiness": 0,
+          "prosperity": 0
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "economic_boost",
+    "name": "Economic Boom",
+    "text": "A renowned merchant guild offers to restructure the kingdom's trade routes, promising lasting prosperity.",
+    "image": "💹",
+    "tags": ["economic", "positive"],
+    "weight": 0.8,
+    "repeatable": false,
+    "choices": [
+      {
+        "id": "invest_trade_routes",
+        "label": "Invest in the guild's plan",
+        "effects": {
+          "treasury": -80,
+          "prosperity": 15,
+          "happiness": 5
+        },
+        "applyModifiers": ["economic_prosperity"]
+      },
+      {
+        "id": "decline_guild",
+        "label": "Decline — the crown handles its own trade",
+        "effects": {
+          "treasury": 20,
+          "loyalty": 5
+        }
+      }
+    ]
+  },
+
+  {
     "id": "golden_harvest",
     "name": "Bountiful Years",
     "text": "The finest harvest in a generation blesses the kingdom!",

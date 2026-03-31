@@ -33,8 +33,22 @@ export function calculateDefiancePenalty(votes, choice) {
   return Math.round(alignment * 15);
 }
 
+export function applyTagBoosts(effects, event, activeModifiers) {
+  const result = { ...effects };
+  for (const mod of activeModifiers) {
+    if (mod.type !== "tag_boost") continue;
+    if (!event.tags || !mod.tags.some(t => event.tags.includes(t))) continue;
+    const val = result[mod.boostStat];
+    if (val !== undefined && val > 0) {
+      result[mod.boostStat] = Math.round(val * (1 + mod.percent));
+    }
+  }
+  return result;
+}
+
 export function tickModifiers(state) {
   for (const mod of state.activeModifiers) {
+    if (mod.type === "tag_boost") continue;
     applyEffects(state.stats, { [mod.stat]: mod.amount });
     if (mod.duration !== null) mod.duration--;
   }

@@ -30,5 +30,15 @@
     "stat": "happiness",
     "amount": 4,
     "duration": 2
+  },
+  {
+    "id": "economic_prosperity",
+    "label": "Economic Prosperity",
+    "icon": "💹",
+    "type": "tag_boost",
+    "tags": ["economic"],
+    "boostStat": "treasury",
+    "percent": 0.1,
+    "duration": null
   }
 ]

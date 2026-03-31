@@ -195,6 +195,28 @@
       margin-right: 7px;
     }
 
+    .bribe-btn {
+      flex: 1;
+      padding: 7px 4px;
+      background: linear-gradient(135deg, #2a2000, #3a2e00);
+      border: 1px solid #7a6000;
+      border-radius: 6px;
+      color: #ffd700;
+      font-size: 0.82em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .bribe-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #3a2e00, #5a4600);
+      border-color: #ffd700;
+    }
+
+    .bribe-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
     .modifier-tag {
       background: #252525;
       border-left: 3px solid #9c27b0;
@@ -212,56 +234,129 @@
       min-height: 40px;
     }
 
-    #history {
-      margin-top: 30px;
-      border-top: 2px solid #444;
-      padding-top: 15px;
-      max-height: 300px;
+    /* ── Scroll panel ── */
+    #scrollPanel {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    #scrollToggle {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      background: linear-gradient(180deg, #5c3d1e 0%, #3b2510 100%);
+      border: 2px solid #a0622a;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+      color: #f5deb3;
+      font-size: 0.8em;
+      letter-spacing: 2px;
+      padding: 18px 7px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: -3px 0 12px rgba(0,0,0,0.5);
+      white-space: nowrap;
+    }
+
+    #scrollToggle:hover {
+      background: linear-gradient(180deg, #7a5230 0%, #5c3d1e 100%);
+    }
+
+    #scrollBody {
+      width: 0;
+      overflow: hidden;
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(180deg, #2e1e0f 0%, #1a1005 100%);
+      border: 2px solid #a0622a;
+      border-right: none;
+      border-radius: 0;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.6);
+    }
+
+    #scrollPanel.open #scrollBody {
+      width: 280px;
+    }
+
+    #scrollPanel.open #scrollToggle {
+      border-radius: 0;
+    }
+
+    #scrollBodyInner {
+      width: 280px;
+      height: 70vh;
       overflow-y: auto;
+      padding: 14px 12px;
+      box-sizing: border-box;
+    }
+
+    #scrollBodyInner::-webkit-scrollbar {
+      width: 5px;
+    }
+    #scrollBodyInner::-webkit-scrollbar-track { background: #1a1005; }
+    #scrollBodyInner::-webkit-scrollbar-thumb { background: #7a5230; border-radius: 3px; }
+
+    .scroll-title {
+      color: #f5deb3;
+      font-size: 0.85em;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #5c3d1e;
     }
 
     .history-item {
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .history-entry {
-      background: #252525;
-      border-left: 3px solid #2196f3;
-      padding: 10px;
-      border-radius: 4px;
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid #a0622a;
+      padding: 8px 10px;
+      border-radius: 3px;
     }
 
     .history-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
 
     .history-age {
-      color: #666;
-      font-size: 0.9em;
+      color: #8b6540;
+      font-size: 0.82em;
     }
 
     .history-event {
       font-weight: bold;
-      color: #fff;
+      color: #f5deb3;
+      font-size: 0.88em;
     }
 
     .history-choice {
-      color: #4caf50;
-      margin-bottom: 5px;
-      font-size: 0.95em;
-    }
-
-    .history-effects {
-      color: #999;
+      color: #c8a96e;
+      margin-bottom: 3px;
       font-size: 0.85em;
     }
 
+    .history-effects {
+      color: #7a6a55;
+      font-size: 0.8em;
+    }
+
     .history-modifiers {
-      color: #9c27b0;
-      font-size: 0.82em;
-      margin-top: 4px;
+      color: #9c7bb5;
+      font-size: 0.78em;
+      margin-top: 3px;
     }
 
     #startScreen {
@@ -361,7 +456,7 @@
   <h1>👑 The King & The People</h1>
   <h2 id="rulerHeading" style="text-align:center; color:#ffd700; font-size:1em; margin-top:-10px; margin-bottom:14px;"></h2>
   <h2>Age: <span id="age"></span></h2>
-  <div class="treasury-display">💰 <span class="treasury-emoji">Treasury: £</span><span id="treasury-value"></span></div>
+  <div class="treasury-display">🪙 <span class="treasury-emoji">Treasury:</span><span id="treasury-value"></span></div>
 
   <div class="stats">
     <div class="stat">
@@ -375,6 +470,15 @@
     <div class="stat">
       Loyalty
       <div class="bar"><div id="loyalty" class="fill" style="background:#ff9800"></div><span id="loyalty-value" class="bar-value"></span></div>
+    </div>
+  </div>
+
+  <div id="bribeSection" style="margin: 8px 0 12px;">
+    <div style="font-size:0.78em; color:#888; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">🪙 Royal Favour — 50 coins each</div>
+    <div style="display:flex; gap:8px;">
+      <button id="bribeHappinessBtn" class="bribe-btn">😊 Happiness +5</button>
+      <button id="bribeProsperityBtn" class="bribe-btn">📈 Prosperity +5</button>
+      <button id="bribeLoyaltyBtn" class="bribe-btn">👑 Loyalty +5</button>
     </div>
   </div>
 
@@ -423,8 +527,10 @@
     <summary style="cursor: pointer; color: #aaa; font-size: 0.85em; user-select: none;">🛠 Debug</summary>
     <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
       <button id="hackHappinessBtn" style="padding: 8px; background: #ff5722; color: white; border: none; border-radius: 5px; cursor: pointer;">Happiness -10</button>
+      <button id="hackHappinessPlusBtn" style="padding: 8px; background: #ff5722; color: white; border: none; border-radius: 5px; cursor: pointer;">Happiness +10</button>
       <button id="hackLoyaltyBtn" style="padding: 8px; background: #e91e63; color: white; border: none; border-radius: 5px; cursor: pointer;">Set Loyalty to 0</button>
       <button id="hackVotesBtn" style="padding: 8px; background: #5c35a0; color: white; border: none; border-radius: 5px; cursor: pointer;">Distribute 50 votes</button>
+      <button id="hackVotesLandslideBtn" style="padding: 8px; background: #5c35a0; color: white; border: none; border-radius: 5px; cursor: pointer;">Landslide (95%)</button>
       <button id="hackEffectNumbersBtn" style="padding: 8px; background: #37474f; color: white; border: none; border-radius: 5px; cursor: pointer;">Show effect numbers</button>
       <button id="hackAddModifierBtn" style="padding: 8px; background: #2e7d32; color: white; border: none; border-radius: 5px; cursor: pointer;">Add random modifier</button>
       <button id="hackClearModifiersBtn" style="padding: 8px; background: #b71c1c; color: white; border: none; border-radius: 5px; cursor: pointer;">Clear all modifiers</button>
@@ -434,8 +540,17 @@
     </div>
   </details>
 
-  <h3>📜 History of Decisions</h3>
-  <div id="history"></div>
+  <div id="scrollPanel">
+    <div id="scrollToggle" onclick="document.getElementById('scrollPanel').classList.toggle('open')">
+      📜 Chronicle
+    </div>
+    <div id="scrollBody">
+      <div id="scrollBodyInner">
+        <div class="scroll-title">📜 Chronicle of Decisions</div>
+        <div id="history"></div>
+      </div>
+    </div>
+  </div>
 
   <div id="startScreen">
     <div class="overlay-box">
@@ -454,6 +569,8 @@
 
       <label for="rulerAge">Starting age</label>
       <input type="number" id="rulerAge" value="18" min="16" max="60" />
+
+      <div id="heirNotice" style="display:none; background: rgba(255,215,0,0.08); border: 1px solid #ffd700; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; color: #ffd700; font-size: 0.85em; line-height: 1.5;"></div>
 
       <button id="startBtn">Begin Reign</button>
     </div>
@@ -480,7 +597,10 @@
           <div id="finalLoyalty" style="font-size: 1.8em; font-weight: bold; color: #ff9800;">0</div>
         </div>
       </div>
-      <button id="restartBtn">Restart Game</button>
+      <div style="display:flex; gap:10px; margin-top: 4px;">
+        <button id="restartBtn" style="flex:1;">New Game</button>
+        <button id="heirBtn" style="flex:1; background: linear-gradient(135deg, #4a3000, #7a5200); border: 2px solid #ffd700; color: #ffd700;">👑 Create Heir</button>
+      </div>
     </div>
   </div>
 

@@ -12,6 +12,9 @@ export function renderState(state) {
     elem.style.width = state.stats[key] + "%";
     value.textContent = state.stats[key];
   }
+
+  const canAfford = state.stats.treasury >= 50;
+  document.querySelectorAll(".bribe-btn").forEach(btn => { btn.disabled = !canAfford; });
 }
 
 let showEffectNumbers = false;
@@ -90,7 +93,7 @@ export function renderHistory(history) {
   historyContainer.innerHTML = "";
 
   if (history.length === 0) {
-    historyContainer.innerHTML = "<p style='color: #999;'>No decisions yet...</p>";
+    historyContainer.innerHTML = "<p style='color: #8b6540; font-size: 0.85em; text-align: center;'>No decisions yet...</p>";
     return;
   }
 
@@ -111,9 +114,11 @@ export function renderHistory(history) {
         <div class="history-choice">→ ${entry.choiceLabel}</div>
         <div class="history-effects">${effectsText}</div>
         ${entry.modifiers && entry.modifiers.length > 0 ? `<div class="history-modifiers">${entry.modifiers.map(m => {
-          const sign = m.amount > 0 ? "+" : "";
           const dur = m.duration === null ? "permanent" : `${m.duration} rounds`;
-          return `${m.icon} ${m.label}: ${m.stat} ${sign}${m.amount} for ${dur}`;
+          const effect = m.type === "tag_boost"
+            ? `${m.tags.join("/")} treasury +${Math.round(m.percent * 100)}%`
+            : `${m.stat} ${m.amount > 0 ? "+" : ""}${m.amount}`;
+          return `${m.icon} ${m.label}: ${effect} (${dur})`;
         }).join(" · ")}</div>` : ""}
       </div>
     `;
@@ -128,11 +133,12 @@ export function showGameOver(reason, state) {
   document.getElementById("finalProsperity").textContent = state.stats.prosperity;
   document.getElementById("finalLoyalty").textContent = state.stats.loyalty;
 
-  document.querySelectorAll(".card-button, #hackHappinessBtn, #hackLoyaltyBtn").forEach((btn) => {
+  document.querySelectorAll(".card-button, #hackHappinessBtn, #hackLoyaltyBtn, .bribe-btn").forEach((btn) => {
     btn.style.pointerEvents = "none";
     btn.style.opacity = "0.5";
   });
 
+  document.getElementById("heirBtn").style.display = "block";
   document.getElementById("gameOverScreen").style.display = "flex";
 }
 
@@ -147,9 +153,15 @@ export function renderModifiers(activeModifiers) {
 
   section.style.display = "block";
   container.innerHTML = activeModifiers.map(m => {
-    const sign = m.amount > 0 ? "+" : "";
     const dur = m.duration === null ? "permanent" : `${m.duration} round${m.duration === 1 ? "" : "s"} left`;
-    return `<span class="modifier-tag">${m.icon} ${m.label}: ${m.stat} ${sign}${m.amount} (${dur})</span>`;
+    let effect;
+    if (m.type === "tag_boost") {
+      effect = `${m.tags.join("/")} treasury +${Math.round(m.percent * 100)}%`;
+    } else {
+      const sign = m.amount > 0 ? "+" : "";
+      effect = `${m.stat} ${sign}${m.amount}`;
+    }
+    return `<span class="modifier-tag">${m.icon} ${m.label}: ${effect} (${dur})</span>`;
   }).join("");
 }
 
@@ -195,7 +207,7 @@ export function setVotingPhase(active, votes) {
 }
 
 export function resetGameUI() {
-  document.querySelectorAll(".card-button, #hackHappinessBtn, #hackLoyaltyBtn").forEach((btn) => {
+  document.querySelectorAll(".card-button, #hackHappinessBtn, #hackLoyaltyBtn, .bribe-btn").forEach((btn) => {
     btn.style.pointerEvents = "auto";
     btn.style.opacity = "1";
   });

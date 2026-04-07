@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Tree Viewer</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: #111;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    #toolbar h1 {
+      font-size: 1em;
+      color: #ffd700;
+      white-space: nowrap;
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.78em;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .legend-line {
+      width: 20px;
+      height: 2px;
+      flex-shrink: 0;
+    }
+
+    .sep { color: #444; }
+
+    #filterBar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    #filterBar label { font-size: 0.8em; color: #aaa; }
+
+    #tagFilter {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #eee;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.82em;
+    }
+
+    #searchBox {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #eee;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.82em;
+      width: 160px;
+    }
+
+    #resetBtn {
+      background: #333;
+      border: 1px solid #555;
+      color: #eee;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 0.82em;
+      cursor: pointer;
+    }
+    #resetBtn:hover { background: #444; }
+
+    #network {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #tooltip {
+      position: fixed;
+      background: #1e1e1e;
+      border: 1px solid #555;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.82em;
+      max-width: 300px;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+      line-height: 1.55;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    }
+
+    #tooltip h3 { color: #ffd700; margin-bottom: 6px; font-size: 1em; }
+    #tooltip .tip-text { color: #bbb; margin-bottom: 8px; font-style: italic; }
+    #tooltip .tip-tags { margin-bottom: 6px; }
+    .tip-tag {
+      display: inline-block;
+      background: #333;
+      border-radius: 3px;
+      padding: 1px 6px;
+      margin-right: 4px;
+      font-size: 0.9em;
+      color: #aaa;
+    }
+    #tooltip .tip-section { color: #888; font-size: 0.88em; text-transform: uppercase; letter-spacing: 1px; margin: 8px 0 3px; }
+    #tooltip .tip-req { color: #ff9800; }
+    #tooltip .tip-choice { margin-bottom: 4px; }
+    #tooltip .tip-choice-label { color: #eee; font-weight: bold; }
+    #tooltip .tip-effects { color: #888; font-size: 0.9em; }
+    .eff-pos { color: #4caf50; }
+    .eff-neg { color: #f44336; }
+  </style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>👑 Event Tree</h1>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#ffd70044;border:2px solid #ffd700"></div> Event</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9c27b044;border:2px solid #9c27b0;border-radius:50%"></div> Modifier</div>
+    <span class="sep">|</span>
+    <div class="legend-item"><div class="legend-line" style="background:#2196f3"></div> Follow-up</div>
+    <div class="legend-item"><div class="legend-line" style="background:#4caf50;border-top:2px dashed #4caf50;height:0"></div> Requires choice</div>
+    <div class="legend-item"><div class="legend-line" style="background:#9c27b0"></div> Modifier link</div>
+    <div class="legend-item"><div class="legend-line" style="background:#f44336"></div> Removes modifier</div>
+  </div>
+
+  <div id="filterBar">
+    <label>Tag:</label>
+    <select id="tagFilter"><option value="">All</option></select>
+    <input id="searchBox" type="text" placeholder="Search events..." />
+    <button id="resetBtn">Reset view</button>
+  </div>
+</div>
+
+<div id="network"></div>
+<div id="tooltip"></div>
+
+<script>
+const TAG_COLORS = {
+  economic:   '#2196f3',
+  crisis:     '#f44336',
+  military:   '#ff5722',
+  diplomatic: '#4caf50',
+  political:  '#ff9800',
+  positive:   '#8bc34a',
+  fantasy:    '#9c27b0',
+  health:     '#00bcd4',
+  test:       '#607d8b',
+  chance:     '#ffc107',
+};
+
+function tagColor(tags) {
+  for (const t of (tags || [])) {
+    if (TAG_COLORS[t]) return TAG_COLORS[t];
+  }
+  return '#888888';
+}
+
+function fmtEffect(key, val) {
+  if (val === 0) return null;
+  const sign = val > 0 ? '+' : '';
+  const cls = val > 0 ? 'eff-pos' : 'eff-neg';
+  const label = key === 'treasury' ? '🪙' : key === 'happiness' ? '😊' : key === 'prosperity' ? '📈' : key === 'loyalty' ? '👑' : key;
+  return `<span class="${cls}">${label} ${sign}${val}</span>`;
+}
+
+function buildTooltip(event) {
+  let html = `<h3>${event.image || ''} ${event.name}</h3>`;
+  html += `<div class="tip-text">${event.text}</div>`;
+
+  if (event.tags?.length) {
+    html += `<div class="tip-tags">${event.tags.map(t => `<span class="tip-tag">${t}</span>`).join('')}</div>`;
+  }
+
+  if (event.requirements) {
+    html += `<div class="tip-section">Requirements</div>`;
+    const r = event.requirements;
+    if (r.choicesMade?.length) {
+      html += `<div class="tip-req">✅ Choices: ${r.choicesMade.join(', ')}</div>`;
+    }
+    if (r.activeModifiers?.length) {
+      html += `<div class="tip-req">⚙️ Modifiers: ${r.activeModifiers.join(', ')}</div>`;
+    }
+    if (r.stats) {
+      const statLines = Object.entries(r.stats).map(([k, cond]) => {
+        const parts = Object.entries(cond).map(([op, v]) => `${op} ${v}`).join(', ');
+        return `${k}: ${parts}`;
+      });
+      html += `<div class="tip-req">📊 Stats: ${statLines.join(' | ')}</div>`;
+    }
+  }
+
+  if (event.choices?.length) {
+    html += `<div class="tip-section">Choices</div>`;
+    event.choices.forEach(c => {
+      const effs = Object.entries(c.effects || {}).map(([k,v]) => fmtEffect(k,v)).filter(Boolean).join(' ');
+      const followUp = c.followUp ? ` <span style="color:#2196f3">→ ${c.followUp}</span>` : '';
+      const mods = c.applyModifiers?.length ? ` <span style="color:#9c27b0">+mod: ${c.applyModifiers.join(',')}</span>` : '';
+      const rmods = c.removeModifiers?.length ? ` <span style="color:#f44336">-mod: ${c.removeModifiers.join(',')}</span>` : '';
+      html += `<div class="tip-choice">
+        <div class="tip-choice-label">${c.label}</div>
+        <div class="tip-effects">${effs || '–'}${followUp}${mods}${rmods}</div>
+      </div>`;
+    });
+  }
+
+  return html;
+}
+
+async function init() {
+  const res = await fetch('./data/events.json');
+  const events = await res.json();
+
+  // Build choiceId → eventId lookup
+  const choiceToEvent = {};
+  events.forEach(ev => {
+    ev.choices?.forEach(c => { choiceToEvent[c.id] = ev.id; });
+  });
+
+  // Collect all tags for filter
+  const allTags = new Set();
+  events.forEach(ev => ev.tags?.forEach(t => allTags.add(t)));
+  const tagFilter = document.getElementById('tagFilter');
+  [...allTags].sort().forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t;
+    tagFilter.appendChild(opt);
+  });
+
+  const modifierSet = new Set();
+  let allNodes = [];
+  let allEdges = [];
+  let edgeId = 0;
+
+  // Event nodes
+  events.forEach(ev => {
+    const col = tagColor(ev.tags);
+    allNodes.push({
+      id: ev.id,
+      label: (ev.image ? ev.image + '\n' : '') + ev.name,
+      title: buildTooltip(ev),
+      color: { background: col + '22', border: col, highlight: { background: col + '55', border: col } },
+      font: { color: '#eee', size: 13, multi: false },
+      shape: 'box',
+      borderWidth: 2,
+      _tags: ev.tags || [],
+      _name: ev.name.toLowerCase(),
+      _type: 'event',
+    });
+
+    ev.choices?.forEach(c => {
+      // followUp edges
+      if (c.followUp) {
+        allEdges.push({
+          id: edgeId++,
+          from: ev.id,
+          to: c.followUp,
+          label: c.label.length > 28 ? c.label.slice(0, 26) + '…' : c.label,
+          color: { color: '#2196f3', highlight: '#64b5f6' },
+          arrows: 'to',
+          dashes: false,
+          font: { color: '#90caf9', size: 10, align: 'middle' },
+          smooth: { type: 'curvedCW', roundness: 0.2 },
+          _type: 'followup',
+        });
+      }
+
+      // applyModifiers
+      c.applyModifiers?.forEach(mod => {
+        if (!modifierSet.has(mod)) {
+          modifierSet.add(mod);
+          allNodes.push({
+            id: 'mod_' + mod,
+            label: '⚙️ ' + mod.replace(/_/g, ' '),
+            color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
+            font: { color: '#ce93d8', size: 12 },
+            shape: 'ellipse',
+            borderWidth: 2,
+            _tags: ['modifier'],
+            _name: mod.toLowerCase(),
+            _type: 'modifier',
+          });
+        }
+        allEdges.push({
+          id: edgeId++,
+          from: ev.id,
+          to: 'mod_' + mod,
+          label: '+mod',
+          color: { color: '#9c27b0', highlight: '#ce93d8' },
+          arrows: 'to',
+          dashes: false,
+          font: { color: '#9c27b0', size: 9 },
+          smooth: { type: 'curvedCCW', roundness: 0.3 },
+          _type: 'modifier',
+        });
+      });
+
+      // removeModifiers
+      c.removeModifiers?.forEach(mod => {
+        if (!modifierSet.has(mod)) {
+          modifierSet.add(mod);
+          allNodes.push({
+            id: 'mod_' + mod,
+            label: '⚙️ ' + mod.replace(/_/g, ' '),
+            color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
+            font: { color: '#ce93d8', size: 12 },
+            shape: 'ellipse',
+            borderWidth: 2,
+            _tags: ['modifier'],
+            _name: mod.toLowerCase(),
+            _type: 'modifier',
+          });
+        }
+        allEdges.push({
+          id: edgeId++,
+          from: ev.id,
+          to: 'mod_' + mod,
+          label: '-mod',
+          color: { color: '#f44336', highlight: '#ef9a9a' },
+          arrows: 'to',
+          dashes: true,
+          font: { color: '#f44336', size: 9 },
+          smooth: { type: 'curvedCCW', roundness: 0.3 },
+          _type: 'removes',
+        });
+      });
+    });
+
+    // requirements → edges
+    if (ev.requirements) {
+      ev.requirements.choicesMade?.forEach(choiceId => {
+        const src = choiceToEvent[choiceId];
+        if (src) {
+          allEdges.push({
+            id: edgeId++,
+            from: src,
+            to: ev.id,
+            label: '🔓 ' + choiceId.replace(/_/g, ' '),
+            color: { color: '#4caf50', highlight: '#a5d6a7' },
+            arrows: 'to',
+            dashes: true,
+            font: { color: '#81c784', size: 10, align: 'middle' },
+            smooth: { type: 'curvedCW', roundness: 0.35 },
+            _type: 'requires',
+          });
+        }
+      });
+
+      ev.requirements.activeModifiers?.forEach(mod => {
+        if (!modifierSet.has(mod)) {
+          modifierSet.add(mod);
+          allNodes.push({
+            id: 'mod_' + mod,
+            label: '⚙️ ' + mod.replace(/_/g, ' '),
+            color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
+            font: { color: '#ce93d8', size: 12 },
+            shape: 'ellipse',
+            borderWidth: 2,
+            _tags: ['modifier'],
+            _name: mod.toLowerCase(),
+            _type: 'modifier',
+          });
+        }
+        allEdges.push({
+          id: edgeId++,
+          from: 'mod_' + mod,
+          to: ev.id,
+          label: 'requires',
+          color: { color: '#9c27b0', highlight: '#ce93d8' },
+          arrows: 'to',
+          dashes: true,
+          font: { color: '#9c27b0', size: 9 },
+          smooth: { type: 'curvedCCW', roundness: 0.25 },
+          _type: 'modifier',
+        });
+      });
+    }
+  });
+
+  const nodes = new vis.DataSet(allNodes);
+  const edges = new vis.DataSet(allEdges);
+
+  const container = document.getElementById('network');
+  const network = new vis.Network(container, { nodes, edges }, {
+    layout: {
+      improvedLayout: true,
+      hierarchical: false,
+    },
+    physics: {
+      enabled: true,
+      solver: 'forceAtlas2Based',
+      forceAtlas2Based: {
+        gravitationalConstant: -60,
+        centralGravity: 0.005,
+        springLength: 180,
+        springConstant: 0.08,
+        damping: 0.6,
+      },
+      stabilization: { iterations: 200 },
+    },
+    interaction: {
+      hover: true,
+      tooltipDelay: 100,
+      navigationButtons: true,
+      keyboard: true,
+    },
+    edges: {
+      width: 1.5,
+      selectionWidth: 3,
+    },
+    nodes: {
+      margin: 10,
+    },
+  });
+
+  // Tooltip on hover
+  const tooltip = document.getElementById('tooltip');
+  network.on('hoverNode', (params) => {
+    const node = allNodes.find(n => n.id === params.node);
+    if (!node || node._type === 'modifier') return;
+    const pos = params.event.center;
+    tooltip.innerHTML = node.title || '';
+    tooltip.style.display = 'block';
+    tooltip.style.left = (pos.x + 16) + 'px';
+    tooltip.style.top  = (pos.y + 16) + 'px';
+  });
+  network.on('blurNode', () => { tooltip.style.display = 'none'; });
+  network.on('dragStart', () => { tooltip.style.display = 'none'; });
+
+  // Disable physics after stabilization for performance
+  network.on('stabilizationIterationsDone', () => {
+    network.setOptions({ physics: { enabled: false } });
+  });
+
+  // Reset view
+  document.getElementById('resetBtn').onclick = () => {
+    network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+  };
+
+  // Tag filter
+  tagFilter.addEventListener('change', applyFilter);
+  document.getElementById('searchBox').addEventListener('input', applyFilter);
+
+  function applyFilter() {
+    const tag = tagFilter.value;
+    const search = document.getElementById('searchBox').value.toLowerCase();
+
+    allNodes.forEach(n => {
+      const tagMatch = !tag || n._tags.includes(tag);
+      const searchMatch = !search || n._name?.includes(search);
+      nodes.update({ id: n.id, hidden: !(tagMatch && searchMatch) });
+    });
+  }
+}
+
+init().catch(err => {
+  document.getElementById('network').innerHTML =
+    `<div style="color:#f44336;padding:40px;font-size:1.1em;">
+      Failed to load events.json<br><small>${err.message}</small><br><br>
+      Make sure you're running this via a local server (e.g. <code>python -m http.server 8080</code>).
+    </div>`;
+});
+</script>
+</body>
+</html>

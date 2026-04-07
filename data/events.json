@@ -1,5 +1,32 @@
 [
   {
+    "id": "roll_the_dice",
+    "name": "Roll the Dice",
+    "text": "A travelling gambler challenges the crown to a high-stakes wager. Fortune favours the bold — or does it?",
+    "image": "🎲",
+    "tags": ["chance"],
+    "weight": 1.0,
+    "repeatable": true,
+    "choices": [
+      {
+        "id": "take_the_wager",
+        "label": "Accept the wager",
+        "effects": {},
+        "roll": {
+          "chance": 0.5,
+          "success": { "treasury": 100 },
+          "failure": { "treasury": -100 }
+        }
+      },
+      {
+        "id": "decline_the_wager",
+        "label": "Decline — gambling is beneath the crown",
+        "effects": {}
+      }
+    ]
+  },
+
+  {
     "id": "poor_harvest",
     "name": "The Failing Harvest",
     "text": "A poor harvest has left the granaries dangerously low.",
@@ -326,6 +353,71 @@
       }
     ]
   },
+
+  {
+    "id": "emils_WarTax_Test",
+    "name": "Emil is doing a warTax test",
+    "text": "Emil is trying to remove a permanent modifier.",
+    "image": "🧪",
+    "tags": ["test", "crisis"],
+    "weight": 0.9,
+    "repeatable": false,
+    "requirements": {
+      "activeModifiers": ["war_tax"]
+    },
+    "choices": [
+      {
+        "id": "remove_the_tax",
+        "label": "This removes the war tax",
+        "effects": {
+          "loyalty": 0,
+          "happiness": 0,
+          "prosperity": 0
+        },
+        "removeModifiers": ["war_tax"]
+      },
+      {
+        "id": "keep_the_tax",
+        "label": "This choice does nothing",
+        "effects": {
+          "loyalty": 0,
+          "happiness": 0,
+          "prosperity": 0
+        }
+      }
+    ]
+  },
+
+  {
+    "id": "emils_longText_Test",
+    "name": "Emil is doing a long text test",
+    "text": "Emil is trying to have a very long text. Like trhis hlkjsahjlkasf ljkfdsalkjhfsd lkjhdfslkjh fdllkjhfd lkjhfdslkjhfdsjlkh fds ljkfdsahljkfda lkjdsalkjf sdlkjh dsj vpoa vle ffljdska vchajlks flak chlakjdhf alkjsxch vsdkljahf dfvslkjhdgv adlkjs cvglksvg lkjdavgh dd.\nIt should also try with very lllllllllllllllloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooonnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnngggggggggggggggggggggggggggggggggggggggggggggggggggggggggg wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwooooooooooooooooooooooooooooooooooooooooooooooorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrdddddddddddddddddddddsssssssssssssss",
+    "image": "🧪",
+    "tags": ["test"],
+    "weight": 0.9,
+    "repeatable": false,
+    "choices": [
+      {
+        "id": "textTest",
+        "label": "This choice does nothing",
+        "effects": {
+          "loyalty": 0,
+          "happiness": 0,
+          "prosperity": 0
+        }
+      },
+      {
+        "id": "textTest2",
+        "label": "This choice gives 5 happiness",
+        "effects": {
+          "loyalty": 0,
+          "happiness": 5,
+          "prosperity": 0
+        }
+      }
+    ]
+  },
+
 
   {
     "id": "emils_test",

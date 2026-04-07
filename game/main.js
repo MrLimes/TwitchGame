@@ -1,6 +1,6 @@
 import { state } from "./state.js";
-import { applyEffects, calculateDefiancePenalty, checkEndConditions, tickModifiers, activateModifiers, getVoteMultiplier, applyTagBoosts } from "./rules.js";
-import { renderState, renderEvent, renderVotes, log, showGameOver, renderHistory, resetGameUI, setVotingPhase, updateTimer, renderModifiers, updateKingIndicators } from "../ui/ui.js";
+import { applyEffects, calculateDefiancePenalty, checkEndConditions, tickModifiers, activateModifiers, removeModifiers, getVoteMultiplier, applyTagBoosts } from "./rules.js";
+import { renderState, renderEvent, renderVotes, log, showGameOver, renderHistory, resetGameUI, setVotingPhase, updateTimer, renderModifiers, updateKingIndicators, showDiceRoll } from "../ui/ui.js";
 import { resolveNextEvent, queueFollowUp } from "./eventManager.js";
 import { initDebug, rebuildEventSelect } from "./debug.js";
 import { saveLineage, loadLineage, clearLineage, ordinal, stripOrdinal } from "./save.js";
@@ -198,58 +198,77 @@ function decide(choice) {
   state.seenEvents.add(event.id);
   state.choicesMade.add(selected.id);
   const voteMultiplier = getVoteMultiplier(state.votes, choice);
-  const boostedEffects = applyTagBoosts(selected.effects, event, state.activeModifiers);
 
-  // Build the actual applied effects (with tag boosts and vote multiplier)
-  const appliedEffects = {};
-  for (const key in boostedEffects) {
-    const isPermanent = key === "treasury";
-    appliedEffects[key] = isPermanent
-      ? boostedEffects[key]
-      : Math.round(boostedEffects[key] * voteMultiplier);
+  const applyDecision = (rollOutcome = null) => {
+    const baseEffects = { ...selected.effects };
+    if (rollOutcome && selected.roll) {
+      const rollEffects = selected.roll[rollOutcome] ?? {};
+      for (const key in rollEffects) {
+        baseEffects[key] = (baseEffects[key] ?? 0) + rollEffects[key];
+      }
+    }
+    const boostedEffects = applyTagBoosts(baseEffects, event, state.activeModifiers);
+    const appliedEffects = {};
+    for (const key in boostedEffects) {
+      const isPermanent = key === "treasury";
+      appliedEffects[key] = isPermanent
+        ? boostedEffects[key]
+        : Math.round(boostedEffects[key] * voteMultiplier);
+    }
+    applyEffects(state.stats, boostedEffects, voteMultiplier);
+
+    if (selected.followUp) queueFollowUp(state, selected.followUp);
+    activateModifiers(selected, modifierDefs, state);
+    removeModifiers(selected, state);
+    renderModifiers(state.activeModifiers);
+
+    state.history.push({
+      age: state.age,
+      eventName: event.name,
+      eventText: event.text,
+      choiceLabel: selected.label,
+      effects: appliedEffects,
+      modifiers: state.activeModifiers.map(m => ({ ...m }))
+    });
+
+    const penalty = calculateDefiancePenalty(state.votes, choice);
+    const total = state.votes[0] + state.votes[1];
+    const share = total > 0 ? Math.round(state.votes[choice] / total * 100) : 50;
+    let logMsg = penalty > 0
+      ? `You defied the people. Loyalty -${penalty}`
+      : "You ruled in accordance with the people.";
+    if (voteMultiplier !== 1) {
+      const pct = voteMultiplier > 1
+        ? `+${Math.round((voteMultiplier - 1) * 100)}%`
+        : `-${Math.round((1 - voteMultiplier) * 100)}%`;
+      logMsg += ` The people's will (${share}% support) ${voteMultiplier > 1 ? "boosted" : "reduced"} effects by ${pct}.`;
+    }
+    if (rollOutcome) {
+      logMsg += rollOutcome === "success"
+        ? " The dice rolled in your favour!"
+        : " The dice were unkind.";
+    }
+    if (penalty > 0) state.stats.loyalty -= penalty;
+    log(logMsg);
+
+    state.age++;
+    renderState(state);
+    renderHistory(state.history);
+    rebuildEventSelect(events);
+
+    const endReason = checkEndConditions(state);
+    if (endReason) {
+      showGameOver(endReason, state);
+      state.gameOver = true;
+      return;
+    }
+
+    setTimeout(startRound, 1000);
+  };
+
+  if (selected.roll) {
+    showDiceRoll(selected.roll.chance, applyDecision);
+  } else {
+    applyDecision(null);
   }
-  applyEffects(state.stats, boostedEffects, voteMultiplier);
-
-  if (selected.followUp) queueFollowUp(state, selected.followUp);
-  activateModifiers(selected, modifierDefs, state);
-  renderModifiers(state.activeModifiers);
-
-  // Record history entry — snapshot all active modifiers with current durations
-  state.history.push({
-    age: state.age,
-    eventName: event.name,
-    eventText: event.text,
-    choiceLabel: selected.label,
-    effects: appliedEffects,
-    modifiers: state.activeModifiers.map(m => ({ ...m }))
-  });
-
-  const penalty = calculateDefiancePenalty(state.votes, choice);
-  const total = state.votes[0] + state.votes[1];
-  const share = total > 0 ? Math.round(state.votes[choice] / total * 100) : 50;
-  let logMsg = penalty > 0
-    ? `You defied the people. Loyalty -${penalty}`
-    : "You ruled in accordance with the people.";
-  if (voteMultiplier !== 1) {
-    const pct = voteMultiplier > 1
-      ? `+${Math.round((voteMultiplier - 1) * 100)}%`
-      : `-${Math.round((1 - voteMultiplier) * 100)}%`;
-    logMsg += ` The people's will (${share}% support) ${voteMultiplier > 1 ? "boosted" : "reduced"} effects by ${pct}.`;
-  }
-  if (penalty > 0) state.stats.loyalty -= penalty;
-  log(logMsg);
-
-  state.age++;
-  renderState(state);
-  renderHistory(state.history);
-  rebuildEventSelect(events);
-
-  const endReason = checkEndConditions(state);
-  if (endReason) {
-    showGameOver(endReason, state);
-    state.gameOver = true;
-    return;
-  }
-
-  setTimeout(startRound, 1000);
 }

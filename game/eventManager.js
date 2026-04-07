@@ -25,6 +25,12 @@ export function isEventEligible(event, state) {
     }
   }
 
+  if (req.activeModifiers) {
+    for (const id of req.activeModifiers) {
+      if (!state.activeModifiers.some(m => m.id === id)) return false;
+    }
+  }
+
   return true;
 }
 

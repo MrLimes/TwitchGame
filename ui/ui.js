@@ -217,4 +217,53 @@ export function resetGameUI() {
   document.getElementById("gameOverText").textContent = "";
 }
 
+export function showDiceRoll(chance, onComplete) {
+  const overlay   = document.getElementById("diceOverlay");
+  const face      = document.getElementById("diceFace");
+  const numEl     = document.getElementById("diceNumber");
+  const outcomeEl = document.getElementById("diceOutcomeLabel");
+  const threshEl  = document.getElementById("diceThresholdLabel");
+
+  // d20 threshold (5% increments, clamped so 2-19 are normal range)
+  const need = Math.max(2, Math.min(19, Math.round((1 - chance) * 20) + 1));
+
+  // Roll the die — 1 always fails, 20 always succeeds, else compare to threshold
+  const rolled = Math.ceil(Math.random() * 20);
+  const outcome = rolled === 20 ? "success"
+    : rolled === 1  ? "failure"
+    : rolled >= need ? "success" : "failure";
+
+  threshEl.textContent = `Need ${need}+ to succeed (1 always fails, 20 always succeeds)`;
+  outcomeEl.textContent = "";
+  outcomeEl.style.color = "";
+  numEl.textContent = "?";
+  face.className = "dice-face rolling";
+  overlay.style.display = "flex";
+
+  let elapsed = 0;
+  const interval = setInterval(() => {
+    numEl.textContent = Math.ceil(Math.random() * 20);
+    elapsed += 60;
+    if (elapsed >= 1500) {
+      clearInterval(interval);
+      numEl.textContent = rolled;
+      face.className = `dice-face ${outcome}`;
+      outcomeEl.textContent = outcome === "success" ? "✓ Success!" : "✗ Failure!";
+      outcomeEl.style.color = outcome === "success" ? "#4caf50" : "#f44336";
+    }
+  }, 60);
+
+  let dismissed = false;
+  const dismiss = () => {
+    if (elapsed < 1500 || dismissed) return;
+    dismissed = true;
+    overlay.style.display = "none";
+    overlay.removeEventListener("click", dismiss);
+    onComplete(outcome);
+  };
+
+  setTimeout(() => overlay.addEventListener("click", dismiss), 1600);
+  setTimeout(() => dismiss(), 3500);
+}
+
 ``

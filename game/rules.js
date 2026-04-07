@@ -64,6 +64,11 @@ export function activateModifiers(choice, modifierDefs, state) {
   }
 }
 
+export function removeModifiers(choice, state) {
+  if (!choice.removeModifiers || choice.removeModifiers.length === 0) return;
+  state.activeModifiers = state.activeModifiers.filter(m => !choice.removeModifiers.includes(m.id));
+}
+
 export function checkEndConditions(state) {
   if (state.stats.happiness <= 0)
     return "The people revolt and overthrow you.";

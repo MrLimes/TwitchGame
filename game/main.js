@@ -174,7 +174,9 @@ function endVotingPhase() {
     const choices = state.currentEvent.choices;
     updateKingIndicators(
       scaleEffects(choices[0].effects, state.currentEvent, getVoteMultiplier(state.votes, 0)),
-      scaleEffects(choices[1].effects, state.currentEvent, getVoteMultiplier(state.votes, 1))
+      scaleEffects(choices[1].effects, state.currentEvent, getVoteMultiplier(state.votes, 1)),
+      choices[0],
+      choices[1]
     );
   }
 

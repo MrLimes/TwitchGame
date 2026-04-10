@@ -94,7 +94,7 @@
       width: 160px;
     }
 
-    #resetBtn {
+    .tb-btn {
       background: #333;
       border: 1px solid #555;
       color: #eee;
@@ -102,8 +102,29 @@
       padding: 4px 10px;
       font-size: 0.82em;
       cursor: pointer;
+      white-space: nowrap;
     }
-    #resetBtn:hover { background: #444; }
+    .tb-btn:hover { background: #444; }
+    .tb-btn.primary {
+      background: #1a3a1a;
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+    .tb-btn.primary:hover { background: #2a4a2a; }
+    .tb-btn.gold {
+      background: #2a2000;
+      border-color: #ffd700;
+      color: #ffd700;
+    }
+    .tb-btn.gold:hover { background: #3a3000; }
+
+    /* ── Main layout ── */
+    #mainArea {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      position: relative;
+    }
 
     #network {
       flex: 1;
@@ -111,6 +132,230 @@
       overflow: hidden;
     }
 
+    /* ── Slide-in editor panel ── */
+    #editorPanel {
+      width: 0;
+      overflow: hidden;
+      transition: width 0.3s ease;
+      background: #161616;
+      border-left: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #editorPanel.open {
+      width: 380px;
+    }
+
+    #editorInner {
+      width: 380px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    #editorInner::-webkit-scrollbar { width: 5px; }
+    #editorInner::-webkit-scrollbar-track { background: #161616; }
+    #editorInner::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+    #editorInner h2 {
+      color: #ffd700;
+      font-size: 1em;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #editorInner h2 button {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 1.1em;
+      padding: 0;
+    }
+    #editorInner h2 button:hover { color: #eee; }
+
+    .field-group {
+      margin-bottom: 12px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.75em;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .field-group input,
+    .field-group textarea,
+    .field-group select {
+      width: 100%;
+      background: #222;
+      border: 1px solid #444;
+      color: #eee;
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 0.85em;
+      font-family: inherit;
+    }
+
+    .field-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .field-group input:focus,
+    .field-group textarea:focus,
+    .field-group select:focus {
+      outline: none;
+      border-color: #ffd700;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .field-row .field-group { flex: 1; }
+
+    .section-header {
+      font-size: 0.72em;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 16px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    /* Choice cards */
+    .choice-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .choice-card .choice-num {
+      font-size: 0.72em;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .choice-card .choice-num button {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+    }
+    .choice-card .choice-num button:hover { color: #f44336; }
+
+    .effects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .effects-grid .field-group { margin-bottom: 0; }
+
+    .add-choice-btn {
+      width: 100%;
+      background: #1a1a2e;
+      border: 1px dashed #444;
+      color: #888;
+      border-radius: 4px;
+      padding: 6px;
+      font-size: 0.82em;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .add-choice-btn:hover { border-color: #2196f3; color: #2196f3; }
+
+    /* Requirements */
+    .req-section {
+      background: #1a1500;
+      border: 1px solid #3a3000;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .stat-req-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.82em;
+    }
+
+    .stat-req-row select, .stat-req-row input {
+      flex: 1;
+      background: #222;
+      border: 1px solid #444;
+      color: #eee;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 0.85em;
+    }
+
+    .stat-req-row button {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .stat-req-row button:hover { color: #f44336; }
+
+    /* Bottom action bar */
+    #editorActions {
+      padding: 12px 16px;
+      border-top: 1px solid #333;
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    #editorActions button {
+      flex: 1;
+      padding: 8px;
+      border-radius: 5px;
+      font-size: 0.85em;
+      cursor: pointer;
+      border: 1px solid;
+    }
+
+    #saveEventBtn {
+      background: #1a3a1a;
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+    #saveEventBtn:hover { background: #2a5a2a; }
+
+    #cancelEditorBtn {
+      background: #2a2a2a;
+      border-color: #555;
+      color: #aaa;
+    }
+    #cancelEditorBtn:hover { background: #333; }
+
+    /* Tooltip */
     #tooltip {
       position: fixed;
       background: #1e1e1e;
@@ -145,6 +390,25 @@
     #tooltip .tip-effects { color: #888; font-size: 0.9em; }
     .eff-pos { color: #4caf50; }
     .eff-neg { color: #f44336; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      border: 1px solid #555;
+      color: #eee;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -166,12 +430,96 @@
     <label>Tag:</label>
     <select id="tagFilter"><option value="">All</option></select>
     <input id="searchBox" type="text" placeholder="Search events..." />
-    <button id="resetBtn">Reset view</button>
+    <button class="tb-btn" id="resetBtn">Reset view</button>
+    <button class="tb-btn primary" id="newEventBtn">➕ New Event</button>
+    <button class="tb-btn gold" id="downloadBtn">💾 Download JSON</button>
   </div>
 </div>
 
-<div id="network"></div>
+<div id="mainArea">
+  <div id="network"></div>
+
+  <!-- Editor panel -->
+  <div id="editorPanel">
+    <div id="editorInner">
+      <h2>
+        <span id="editorTitle">New Event</span>
+        <button id="closeEditorBtn" title="Close">✕</button>
+      </h2>
+
+      <!-- Basic info -->
+      <div class="field-row">
+        <div class="field-group" style="flex:0 0 60px;">
+          <label>Image</label>
+          <input type="text" id="f-image" placeholder="🎲" maxlength="4" style="text-align:center;font-size:1.4em;padding:2px;" />
+        </div>
+        <div class="field-group">
+          <label>Name *</label>
+          <input type="text" id="f-name" placeholder="The Failing Harvest" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>ID (auto-generated)</label>
+        <input type="text" id="f-id" placeholder="the_failing_harvest" />
+      </div>
+
+      <div class="field-group">
+        <label>Description text *</label>
+        <textarea id="f-text" placeholder="What is this event about?"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="f-tags" placeholder="economic, crisis" />
+        </div>
+        <div class="field-group" style="flex:0 0 80px;">
+          <label>Weight</label>
+          <input type="number" id="f-weight" value="1.0" step="0.1" min="0" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>
+          <input type="checkbox" id="f-repeatable" style="width:auto;margin-right:6px;" />
+          Repeatable
+        </label>
+      </div>
+
+      <!-- Requirements -->
+      <div class="section-header">Requirements (optional)</div>
+      <div class="req-section">
+        <div class="field-group">
+          <label>Choices made (IDs, comma-separated)</label>
+          <input type="text" id="f-req-choices" placeholder="raise_taxes, crack_down" />
+        </div>
+        <div class="field-group">
+          <label>Active modifiers (comma-separated)</label>
+          <input type="text" id="f-req-modifiers" placeholder="war_tax, drought" />
+        </div>
+        <div class="field-group">
+          <label>Stat conditions</label>
+          <div id="statReqs"></div>
+          <button type="button" class="add-choice-btn" id="addStatReqBtn" style="margin-bottom:0;">+ Add stat condition</button>
+        </div>
+      </div>
+
+      <!-- Choices -->
+      <div class="section-header">Choices *</div>
+      <div id="choicesContainer"></div>
+      <button type="button" class="add-choice-btn" id="addChoiceBtn">+ Add choice</button>
+
+    </div>
+    <div id="editorActions">
+      <button id="cancelEditorBtn">Cancel</button>
+      <button id="saveEventBtn">✓ Save Event</button>
+    </div>
+  </div>
+</div>
+
 <div id="tooltip"></div>
+<div id="toast"></div>
 
 <script>
 const TAG_COLORS = {
@@ -205,20 +553,14 @@ function fmtEffect(key, val) {
 function buildTooltip(event) {
   let html = `<h3>${event.image || ''} ${event.name}</h3>`;
   html += `<div class="tip-text">${event.text}</div>`;
-
   if (event.tags?.length) {
     html += `<div class="tip-tags">${event.tags.map(t => `<span class="tip-tag">${t}</span>`).join('')}</div>`;
   }
-
   if (event.requirements) {
     html += `<div class="tip-section">Requirements</div>`;
     const r = event.requirements;
-    if (r.choicesMade?.length) {
-      html += `<div class="tip-req">✅ Choices: ${r.choicesMade.join(', ')}</div>`;
-    }
-    if (r.activeModifiers?.length) {
-      html += `<div class="tip-req">⚙️ Modifiers: ${r.activeModifiers.join(', ')}</div>`;
-    }
+    if (r.choicesMade?.length) html += `<div class="tip-req">✅ Choices: ${r.choicesMade.join(', ')}</div>`;
+    if (r.activeModifiers?.length) html += `<div class="tip-req">⚙️ Modifiers: ${r.activeModifiers.join(', ')}</div>`;
     if (r.stats) {
       const statLines = Object.entries(r.stats).map(([k, cond]) => {
         const parts = Object.entries(cond).map(([op, v]) => `${op} ${v}`).join(', ');
@@ -227,7 +569,6 @@ function buildTooltip(event) {
       html += `<div class="tip-req">📊 Stats: ${statLines.join(' | ')}</div>`;
     }
   }
-
   if (event.choices?.length) {
     html += `<div class="tip-section">Choices</div>`;
     event.choices.forEach(c => {
@@ -241,221 +582,383 @@ function buildTooltip(event) {
       </div>`;
     });
   }
-
   return html;
 }
 
+function toSnake(str) {
+  return str.toLowerCase().trim().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+}
+
+function showToast(msg, color = '#4caf50') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = color;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Choice builder ──────────────────────────────────────────
+let choiceCounter = 0;
+
+function makeChoiceCard(index) {
+  choiceCounter++;
+  const id = 'choice_' + choiceCounter;
+  const div = document.createElement('div');
+  div.className = 'choice-card';
+  div.dataset.cid = id;
+  div.innerHTML = `
+    <div class="choice-num">
+      <span>Choice ${index}</span>
+      <button type="button" class="remove-choice-btn" title="Remove">✕</button>
+    </div>
+    <div class="field-group">
+      <label>Label *</label>
+      <input type="text" class="c-label" placeholder="Raise taxes" />
+    </div>
+    <div class="field-group">
+      <label>Choice ID (auto)</label>
+      <input type="text" class="c-id" placeholder="raise_taxes" />
+    </div>
+    <div class="section-header" style="margin-top:8px;">Effects</div>
+    <div class="effects-grid">
+      <div class="field-group"><label>😊 Happiness</label><input type="number" class="c-happiness" value="0" /></div>
+      <div class="field-group"><label>📈 Prosperity</label><input type="number" class="c-prosperity" value="0" /></div>
+      <div class="field-group"><label>👑 Loyalty</label><input type="number" class="c-loyalty" value="0" /></div>
+      <div class="field-group"><label>🪙 Treasury</label><input type="number" class="c-treasury" value="0" /></div>
+    </div>
+    <div class="field-group" style="margin-top:8px;">
+      <label>Follow-up event ID</label>
+      <input type="text" class="c-followup" placeholder="peace_treaty" />
+    </div>
+    <div class="field-group">
+      <label>Apply modifiers (comma-separated)</label>
+      <input type="text" class="c-apply-mods" placeholder="war_tax, drought" />
+    </div>
+    <div class="field-group">
+      <label>Remove modifiers (comma-separated)</label>
+      <input type="text" class="c-remove-mods" placeholder="drought" />
+    </div>
+  `;
+
+  // Auto-generate choice ID from label
+  div.querySelector('.c-label').addEventListener('input', e => {
+    const cid = div.querySelector('.c-id');
+    cid.value = toSnake(e.target.value);
+  });
+
+  div.querySelector('.remove-choice-btn').addEventListener('click', () => {
+    div.remove();
+    renumberChoices();
+  });
+
+  return div;
+}
+
+function renumberChoices() {
+  document.querySelectorAll('.choice-card').forEach((card, i) => {
+    card.querySelector('.choice-num span').textContent = `Choice ${i + 1}`;
+  });
+}
+
+function addChoice() {
+  const container = document.getElementById('choicesContainer');
+  const count = container.querySelectorAll('.choice-card').length + 1;
+  container.appendChild(makeChoiceCard(count));
+}
+
+// ── Stat requirement builder ─────────────────────────────────
+function addStatReq(stat = 'happiness', op = 'lte', val = 50) {
+  const container = document.getElementById('statReqs');
+  const row = document.createElement('div');
+  row.className = 'stat-req-row';
+  row.innerHTML = `
+    <select class="sr-stat">
+      <option value="happiness" ${stat==='happiness'?'selected':''}>😊 Happiness</option>
+      <option value="prosperity" ${stat==='prosperity'?'selected':''}>📈 Prosperity</option>
+      <option value="loyalty" ${stat==='loyalty'?'selected':''}>👑 Loyalty</option>
+    </select>
+    <select class="sr-op">
+      <option value="lte" ${op==='lte'?'selected':''}>≤</option>
+      <option value="gte" ${op==='gte'?'selected':''}>≥</option>
+    </select>
+    <input type="number" class="sr-val" value="${val}" min="0" max="100" />
+    <button type="button" class="remove-stat-req">✕</button>
+  `;
+  row.querySelector('.remove-stat-req').addEventListener('click', () => row.remove());
+  container.appendChild(row);
+}
+
+// ── Read form into event object ──────────────────────────────
+function readForm() {
+  const name = document.getElementById('f-name').value.trim();
+  const id   = document.getElementById('f-id').value.trim() || toSnake(name);
+  const text = document.getElementById('f-text').value.trim();
+  const image = document.getElementById('f-image').value.trim();
+  const tagsRaw = document.getElementById('f-tags').value;
+  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+  const weight = parseFloat(document.getElementById('f-weight').value) || 1.0;
+  const repeatable = document.getElementById('f-repeatable').checked;
+
+  // Requirements
+  const reqChoicesRaw = document.getElementById('f-req-choices').value;
+  const reqChoices = reqChoicesRaw.split(',').map(s => s.trim()).filter(Boolean);
+  const reqModsRaw = document.getElementById('f-req-modifiers').value;
+  const reqMods = reqModsRaw.split(',').map(s => s.trim()).filter(Boolean);
+  const statReqRows = document.querySelectorAll('.stat-req-row');
+  const statsReq = {};
+  statReqRows.forEach(row => {
+    const stat = row.querySelector('.sr-stat').value;
+    const op   = row.querySelector('.sr-op').value;
+    const val  = parseInt(row.querySelector('.sr-val').value, 10);
+    if (!statsReq[stat]) statsReq[stat] = {};
+    statsReq[stat][op] = val;
+  });
+
+  const hasReqs = reqChoices.length || reqMods.length || Object.keys(statsReq).length;
+  const requirements = hasReqs ? {} : null;
+  if (hasReqs) {
+    if (reqChoices.length) requirements.choicesMade = reqChoices;
+    if (reqMods.length) requirements.activeModifiers = reqMods;
+    if (Object.keys(statsReq).length) requirements.stats = statsReq;
+  }
+
+  // Choices
+  const choices = [];
+  document.querySelectorAll('.choice-card').forEach(card => {
+    const label = card.querySelector('.c-label').value.trim();
+    if (!label) return;
+    const choiceId = card.querySelector('.c-id').value.trim() || toSnake(label);
+    const effects = {
+      happiness:  parseInt(card.querySelector('.c-happiness').value, 10) || 0,
+      prosperity: parseInt(card.querySelector('.c-prosperity').value, 10) || 0,
+      loyalty:    parseInt(card.querySelector('.c-loyalty').value, 10) || 0,
+      treasury:   parseInt(card.querySelector('.c-treasury').value, 10) || 0,
+    };
+    // Remove zero effects
+    Object.keys(effects).forEach(k => { if (effects[k] === 0) delete effects[k]; });
+
+    const followUp = card.querySelector('.c-followup').value.trim() || null;
+    const applyMods = card.querySelector('.c-apply-mods').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const removeMods = card.querySelector('.c-remove-mods').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+    const choice = { id: choiceId, label, effects };
+    if (followUp) choice.followUp = followUp;
+    if (applyMods.length) choice.applyModifiers = applyMods;
+    if (removeMods.length) choice.removeModifiers = removeMods;
+    choices.push(choice);
+  });
+
+  const ev = { id, name, text, image: image || '📜', tags, weight, repeatable, choices };
+  if (requirements) ev.requirements = requirements;
+  return ev;
+}
+
+function resetForm() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-id').value = '';
+  document.getElementById('f-text').value = '';
+  document.getElementById('f-image').value = '';
+  document.getElementById('f-tags').value = '';
+  document.getElementById('f-weight').value = '1.0';
+  document.getElementById('f-repeatable').checked = false;
+  document.getElementById('f-req-choices').value = '';
+  document.getElementById('f-req-modifiers').value = '';
+  document.getElementById('statReqs').innerHTML = '';
+  document.getElementById('choicesContainer').innerHTML = '';
+  addChoice();
+  addChoice();
+}
+
+function fillForm(ev) {
+  document.getElementById('f-name').value = ev.name || '';
+  document.getElementById('f-id').value = ev.id || '';
+  document.getElementById('f-text').value = ev.text || '';
+  document.getElementById('f-image').value = ev.image || '';
+  document.getElementById('f-tags').value = (ev.tags || []).join(', ');
+  document.getElementById('f-weight').value = ev.weight ?? 1.0;
+  document.getElementById('f-repeatable').checked = !!ev.repeatable;
+  document.getElementById('f-req-choices').value = (ev.requirements?.choicesMade || []).join(', ');
+  document.getElementById('f-req-modifiers').value = (ev.requirements?.activeModifiers || []).join(', ');
+  document.getElementById('statReqs').innerHTML = '';
+  if (ev.requirements?.stats) {
+    Object.entries(ev.requirements.stats).forEach(([stat, cond]) => {
+      Object.entries(cond).forEach(([op, val]) => addStatReq(stat, op, val));
+    });
+  }
+  document.getElementById('choicesContainer').innerHTML = '';
+  (ev.choices || []).forEach((c, i) => {
+    const card = makeChoiceCard(i + 1);
+    card.querySelector('.c-label').value = c.label || '';
+    card.querySelector('.c-id').value = c.id || '';
+    card.querySelector('.c-happiness').value = c.effects?.happiness ?? 0;
+    card.querySelector('.c-prosperity').value = c.effects?.prosperity ?? 0;
+    card.querySelector('.c-loyalty').value = c.effects?.loyalty ?? 0;
+    card.querySelector('.c-treasury').value = c.effects?.treasury ?? 0;
+    card.querySelector('.c-followup').value = c.followUp || '';
+    card.querySelector('.c-apply-mods').value = (c.applyModifiers || []).join(', ');
+    card.querySelector('.c-remove-mods').value = (c.removeModifiers || []).join(', ');
+    document.getElementById('choicesContainer').appendChild(card);
+  });
+}
+
+// ── Main init ─────────────────────────────────────────────────
 async function init() {
   const res = await fetch('./data/events.json');
   const events = await res.json();
 
-  // Build choiceId → eventId lookup
+  // Mutable master list — new events get appended here
+  const allEvents = [...events];
+
   const choiceToEvent = {};
-  events.forEach(ev => {
+  allEvents.forEach(ev => {
     ev.choices?.forEach(c => { choiceToEvent[c.id] = ev.id; });
   });
 
-  // Collect all tags for filter
-  const allTags = new Set();
-  events.forEach(ev => ev.tags?.forEach(t => allTags.add(t)));
+  // Populate tag filter
+  const allTagsSet = new Set();
+  allEvents.forEach(ev => ev.tags?.forEach(t => allTagsSet.add(t)));
   const tagFilter = document.getElementById('tagFilter');
-  [...allTags].sort().forEach(t => {
+  [...allTagsSet].sort().forEach(t => {
     const opt = document.createElement('option');
-    opt.value = t;
-    opt.textContent = t;
+    opt.value = t; opt.textContent = t;
     tagFilter.appendChild(opt);
   });
 
   const modifierSet = new Set();
-  let allNodes = [];
-  let allEdges = [];
   let edgeId = 0;
+  const nodeList = [];
+  const edgeList = [];
+  let nodes = null;
+  let edges = null;
 
-  // Event nodes
-  events.forEach(ev => {
+  function buildEventNode(ev) {
     const col = tagColor(ev.tags);
-    allNodes.push({
+    return {
       id: ev.id,
       label: (ev.image ? ev.image + '\n' : '') + ev.name,
       title: buildTooltip(ev),
       color: { background: col + '22', border: col, highlight: { background: col + '55', border: col } },
-      font: { color: '#eee', size: 13, multi: false },
+      font: { color: '#eee', size: 13 },
       shape: 'box',
       borderWidth: 2,
       _tags: ev.tags || [],
       _name: ev.name.toLowerCase(),
       _type: 'event',
-    });
+    };
+  }
 
+  function buildModifierNode(mod) {
+    return {
+      id: 'mod_' + mod,
+      label: '⚙️ ' + mod.replace(/_/g, ' '),
+      color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
+      font: { color: '#ce93d8', size: 12 },
+      shape: 'ellipse',
+      borderWidth: 2,
+      _tags: ['modifier'],
+      _name: mod.toLowerCase(),
+      _type: 'modifier',
+    };
+  }
+
+  function ensureModNode(mod) {
+    if (!modifierSet.has(mod)) {
+      modifierSet.add(mod);
+      const n = buildModifierNode(mod);
+      nodeList.push(n);
+      if (nodes) nodes.add(n);
+    }
+  }
+
+  function buildEdgesForEvent(ev) {
+    const newEdges = [];
     ev.choices?.forEach(c => {
-      // followUp edges
       if (c.followUp) {
-        allEdges.push({
-          id: edgeId++,
-          from: ev.id,
-          to: c.followUp,
+        newEdges.push({
+          id: edgeId++, from: ev.id, to: c.followUp,
           label: c.label.length > 28 ? c.label.slice(0, 26) + '…' : c.label,
           color: { color: '#2196f3', highlight: '#64b5f6' },
-          arrows: 'to',
-          dashes: false,
+          arrows: 'to', dashes: false,
           font: { color: '#90caf9', size: 10, align: 'middle' },
-          smooth: { type: 'curvedCW', roundness: 0.2 },
-          _type: 'followup',
+          smooth: { type: 'curvedCW', roundness: 0.2 }, _type: 'followup',
         });
       }
-
-      // applyModifiers
       c.applyModifiers?.forEach(mod => {
-        if (!modifierSet.has(mod)) {
-          modifierSet.add(mod);
-          allNodes.push({
-            id: 'mod_' + mod,
-            label: '⚙️ ' + mod.replace(/_/g, ' '),
-            color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
-            font: { color: '#ce93d8', size: 12 },
-            shape: 'ellipse',
-            borderWidth: 2,
-            _tags: ['modifier'],
-            _name: mod.toLowerCase(),
-            _type: 'modifier',
-          });
-        }
-        allEdges.push({
-          id: edgeId++,
-          from: ev.id,
-          to: 'mod_' + mod,
-          label: '+mod',
+        ensureModNode(mod);
+        newEdges.push({
+          id: edgeId++, from: ev.id, to: 'mod_' + mod, label: '+mod',
           color: { color: '#9c27b0', highlight: '#ce93d8' },
-          arrows: 'to',
-          dashes: false,
+          arrows: 'to', dashes: false,
           font: { color: '#9c27b0', size: 9 },
-          smooth: { type: 'curvedCCW', roundness: 0.3 },
-          _type: 'modifier',
+          smooth: { type: 'curvedCCW', roundness: 0.3 }, _type: 'modifier',
         });
       });
-
-      // removeModifiers
       c.removeModifiers?.forEach(mod => {
-        if (!modifierSet.has(mod)) {
-          modifierSet.add(mod);
-          allNodes.push({
-            id: 'mod_' + mod,
-            label: '⚙️ ' + mod.replace(/_/g, ' '),
-            color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
-            font: { color: '#ce93d8', size: 12 },
-            shape: 'ellipse',
-            borderWidth: 2,
-            _tags: ['modifier'],
-            _name: mod.toLowerCase(),
-            _type: 'modifier',
-          });
-        }
-        allEdges.push({
-          id: edgeId++,
-          from: ev.id,
-          to: 'mod_' + mod,
-          label: '-mod',
+        ensureModNode(mod);
+        newEdges.push({
+          id: edgeId++, from: ev.id, to: 'mod_' + mod, label: '-mod',
           color: { color: '#f44336', highlight: '#ef9a9a' },
-          arrows: 'to',
-          dashes: true,
+          arrows: 'to', dashes: true,
           font: { color: '#f44336', size: 9 },
-          smooth: { type: 'curvedCCW', roundness: 0.3 },
-          _type: 'removes',
+          smooth: { type: 'curvedCCW', roundness: 0.3 }, _type: 'removes',
         });
       });
     });
-
-    // requirements → edges
     if (ev.requirements) {
       ev.requirements.choicesMade?.forEach(choiceId => {
         const src = choiceToEvent[choiceId];
         if (src) {
-          allEdges.push({
-            id: edgeId++,
-            from: src,
-            to: ev.id,
+          newEdges.push({
+            id: edgeId++, from: src, to: ev.id,
             label: '🔓 ' + choiceId.replace(/_/g, ' '),
             color: { color: '#4caf50', highlight: '#a5d6a7' },
-            arrows: 'to',
-            dashes: true,
+            arrows: 'to', dashes: true,
             font: { color: '#81c784', size: 10, align: 'middle' },
-            smooth: { type: 'curvedCW', roundness: 0.35 },
-            _type: 'requires',
+            smooth: { type: 'curvedCW', roundness: 0.35 }, _type: 'requires',
           });
         }
       });
-
       ev.requirements.activeModifiers?.forEach(mod => {
-        if (!modifierSet.has(mod)) {
-          modifierSet.add(mod);
-          allNodes.push({
-            id: 'mod_' + mod,
-            label: '⚙️ ' + mod.replace(/_/g, ' '),
-            color: { background: '#9c27b022', border: '#9c27b0', highlight: { background: '#9c27b055', border: '#ce93d8' } },
-            font: { color: '#ce93d8', size: 12 },
-            shape: 'ellipse',
-            borderWidth: 2,
-            _tags: ['modifier'],
-            _name: mod.toLowerCase(),
-            _type: 'modifier',
-          });
-        }
-        allEdges.push({
-          id: edgeId++,
-          from: 'mod_' + mod,
-          to: ev.id,
-          label: 'requires',
+        ensureModNode(mod);
+        newEdges.push({
+          id: edgeId++, from: 'mod_' + mod, to: ev.id, label: 'requires',
           color: { color: '#9c27b0', highlight: '#ce93d8' },
-          arrows: 'to',
-          dashes: true,
+          arrows: 'to', dashes: true,
           font: { color: '#9c27b0', size: 9 },
-          smooth: { type: 'curvedCCW', roundness: 0.25 },
-          _type: 'modifier',
+          smooth: { type: 'curvedCCW', roundness: 0.25 }, _type: 'modifier',
         });
       });
     }
+    return newEdges;
+  }
+
+  // Build initial nodes/edges
+  allEvents.forEach(ev => {
+    nodeList.push(buildEventNode(ev));
+    edgeList.push(...buildEdgesForEvent(ev));
   });
 
-  const nodes = new vis.DataSet(allNodes);
-  const edges = new vis.DataSet(allEdges);
+  nodes = new vis.DataSet(nodeList);
+  edges = new vis.DataSet(edgeList);
 
   const container = document.getElementById('network');
   const network = new vis.Network(container, { nodes, edges }, {
-    layout: {
-      improvedLayout: true,
-      hierarchical: false,
-    },
+    layout: { improvedLayout: true, hierarchical: false },
     physics: {
       enabled: true,
       solver: 'forceAtlas2Based',
-      forceAtlas2Based: {
-        gravitationalConstant: -60,
-        centralGravity: 0.005,
-        springLength: 180,
-        springConstant: 0.08,
-        damping: 0.6,
-      },
+      forceAtlas2Based: { gravitationalConstant: -60, centralGravity: 0.005, springLength: 180, springConstant: 0.08, damping: 0.6 },
       stabilization: { iterations: 200 },
     },
-    interaction: {
-      hover: true,
-      tooltipDelay: 100,
-      navigationButtons: true,
-      keyboard: true,
-    },
-    edges: {
-      width: 1.5,
-      selectionWidth: 3,
-    },
-    nodes: {
-      margin: 10,
-    },
+    interaction: { hover: true, tooltipDelay: 100, navigationButtons: true, keyboard: true },
+    edges: { width: 1.5, selectionWidth: 3 },
+    nodes: { margin: 10 },
   });
 
-  // Tooltip on hover
+  // Tooltip
   const tooltip = document.getElementById('tooltip');
   network.on('hoverNode', (params) => {
-    const node = allNodes.find(n => n.id === params.node);
+    const node = nodeList.find(n => n.id === params.node);
     if (!node || node._type === 'modifier') return;
     const pos = params.event.center;
     tooltip.innerHTML = node.title || '';
@@ -465,8 +968,6 @@ async function init() {
   });
   network.on('blurNode', () => { tooltip.style.display = 'none'; });
   network.on('dragStart', () => { tooltip.style.display = 'none'; });
-
-  // Disable physics after stabilization for performance
   network.on('stabilizationIterationsDone', () => {
     network.setOptions({ physics: { enabled: false } });
   });
@@ -476,27 +977,155 @@ async function init() {
     network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
   };
 
-  // Tag filter
+  // Tag filter / search
   tagFilter.addEventListener('change', applyFilter);
   document.getElementById('searchBox').addEventListener('input', applyFilter);
-
   function applyFilter() {
     const tag = tagFilter.value;
     const search = document.getElementById('searchBox').value.toLowerCase();
-
-    allNodes.forEach(n => {
+    nodes.forEach(n => {
       const tagMatch = !tag || n._tags.includes(tag);
       const searchMatch = !search || n._name?.includes(search);
       nodes.update({ id: n.id, hidden: !(tagMatch && searchMatch) });
     });
   }
+
+  // ── Editor panel ──────────────────────────────────────────
+  const panel = document.getElementById('editorPanel');
+  let editingId = null; // null = new event, string = editing existing
+
+  function openEditor(ev = null) {
+    if (ev) {
+      editingId = ev.id;
+      fillForm(ev);
+      document.getElementById('editorTitle').textContent = 'Edit Event';
+      document.getElementById('f-id').readOnly = true;
+      document.getElementById('f-id').style.opacity = '0.5';
+    } else {
+      editingId = null;
+      resetForm();
+      document.getElementById('editorTitle').textContent = 'New Event';
+      document.getElementById('f-id').readOnly = false;
+      document.getElementById('f-id').style.opacity = '1';
+    }
+    panel.classList.add('open');
+    document.getElementById('f-name').focus();
+  }
+
+  function closeEditor() {
+    panel.classList.remove('open');
+    editingId = null;
+    document.getElementById('f-id').readOnly = false;
+    document.getElementById('f-id').style.opacity = '1';
+  }
+
+  // Click node to edit
+  network.on('click', (params) => {
+    if (params.nodes.length === 0) return;
+    const nodeId = params.nodes[0];
+    const ev = allEvents.find(e => e.id === nodeId);
+    if (!ev) return; // modifier node, skip
+    tooltip.style.display = 'none';
+    openEditor(ev);
+  });
+
+  document.getElementById('newEventBtn').onclick = () => openEditor(null);
+  document.getElementById('closeEditorBtn').onclick = closeEditor;
+  document.getElementById('cancelEditorBtn').onclick = closeEditor;
+  document.getElementById('addChoiceBtn').onclick = addChoice;
+  document.getElementById('addStatReqBtn').onclick = () => addStatReq();
+
+  // Auto-generate event ID from name (only for new events)
+  document.getElementById('f-name').addEventListener('input', e => {
+    if (!editingId) document.getElementById('f-id').value = toSnake(e.target.value);
+  });
+
+  // Save event
+  document.getElementById('saveEventBtn').onclick = () => {
+    const ev = readForm();
+
+    if (!ev.name) { showToast('Name is required', '#f44336'); return; }
+    if (!ev.text) { showToast('Description is required', '#f44336'); return; }
+    if (ev.choices.length < 1) { showToast('At least one choice is required', '#f44336'); return; }
+
+    if (editingId) {
+      // ── Update existing event ──
+      const idx = allEvents.findIndex(e => e.id === editingId);
+      ev.id = editingId; // keep original ID
+      allEvents[idx] = ev;
+
+      // Update node label/tooltip
+      const updatedNode = buildEventNode(ev);
+      nodes.update({ id: ev.id, label: updatedNode.label, title: updatedNode.title, color: updatedNode.color, _tags: updatedNode._tags, _name: updatedNode._name });
+
+      // Remove old edges from this node and rebuild
+      const oldEdgeIds = edges.get({ filter: e => e.from === ev.id || (e.to === ev.id && e._type !== 'requires') }).map(e => e.id);
+      edges.remove(oldEdgeIds);
+      const newEdges = buildEdgesForEvent(ev);
+      edgeList.push(...newEdges);
+      edges.add(newEdges);
+
+      // Update choice lookup
+      ev.choices.forEach(c => { choiceToEvent[c.id] = ev.id; });
+
+      closeEditor();
+      showToast(`✓ "${ev.name}" updated`);
+    } else {
+      // ── Create new event ──
+      if (allEvents.find(e => e.id === ev.id)) {
+        showToast(`ID "${ev.id}" already exists`, '#f44336'); return;
+      }
+
+      ev.choices.forEach(c => { choiceToEvent[c.id] = ev.id; });
+      allEvents.push(ev);
+
+      const node = buildEventNode(ev);
+      nodeList.push(node);
+      nodes.add(node);
+
+      const newEdges = buildEdgesForEvent(ev);
+      edgeList.push(...newEdges);
+      edges.add(newEdges);
+
+      ev.tags.forEach(t => {
+        if (![...tagFilter.options].some(o => o.value === t)) {
+          const opt = document.createElement('option');
+          opt.value = t; opt.textContent = t;
+          tagFilter.appendChild(opt);
+        }
+      });
+
+      network.setOptions({ physics: { enabled: true } });
+      setTimeout(() => network.setOptions({ physics: { enabled: false } }), 1500);
+
+      closeEditor();
+      showToast(`✓ "${ev.name}" added to graph`);
+    }
+  };
+
+  // ── Download JSON ─────────────────────────────────────────
+  document.getElementById('downloadBtn').onclick = () => {
+    const json = JSON.stringify(allEvents, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'events.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('💾 events.json downloaded');
+  };
+
+  // Init with 2 default choices
+  addChoice();
+  addChoice();
 }
 
 init().catch(err => {
   document.getElementById('network').innerHTML =
     `<div style="color:#f44336;padding:40px;font-size:1.1em;">
       Failed to load events.json<br><small>${err.message}</small><br><br>
-      Make sure you're running this via a local server (e.g. <code>python -m http.server 8080</code>).
+      Make sure you're running via a local server.
     </div>`;
 });
 </script>

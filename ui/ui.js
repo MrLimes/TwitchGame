@@ -28,7 +28,7 @@ function fmt(val) {
   return val > 0 ? `(+${val})` : `(${val})`;
 }
 
-function getEffectIndicators(effects) {
+function getEffectIndicators(effects, choice = null) {
   const indicators = [];
 
   if (effects.happiness > 0) indicators.push(showEffectNumbers ? `↑😊${fmt(effects.happiness)}` : "↑😊");
@@ -43,12 +43,17 @@ function getEffectIndicators(effects) {
   if (effects.treasury > 0) indicators.push(showEffectNumbers ? `↑💷${fmt(effects.treasury)}` : "↑💷");
   if (effects.treasury < 0) indicators.push(showEffectNumbers ? `↓💷${fmt(effects.treasury)}` : "↓💷");
 
+  if (showEffectNumbers && choice) {
+    choice.applyModifiers?.forEach(m => indicators.push(`+⚙️${m.replace(/_/g, ' ')}`));
+    choice.removeModifiers?.forEach(m => indicators.push(`-⚙️${m.replace(/_/g, ' ')}`));
+  }
+
   return indicators;
 }
 
-export function updateKingIndicators(effectsA, effectsB) {
-  document.getElementById("kingA-indicators").textContent = getEffectIndicators(effectsA).join(" ");
-  document.getElementById("kingB-indicators").textContent = getEffectIndicators(effectsB).join(" ");
+export function updateKingIndicators(effectsA, effectsB, choiceA = null, choiceB = null) {
+  document.getElementById("kingA-indicators").textContent = getEffectIndicators(effectsA, choiceA).join(" ");
+  document.getElementById("kingB-indicators").textContent = getEffectIndicators(effectsB, choiceB).join(" ");
 }
 
 export function renderEvent(event) {
@@ -65,8 +70,8 @@ export function renderEvent(event) {
   const choiceA = event.choices[0];
   const choiceB = event.choices[1];
 
-  const indicatorsA = getEffectIndicators(choiceA.effects);
-  const indicatorsB = getEffectIndicators(choiceB.effects);
+  const indicatorsA = getEffectIndicators(choiceA.effects, choiceA);
+  const indicatorsB = getEffectIndicators(choiceB.effects, choiceB);
 
   document.getElementById("voteA-title").textContent = choiceA.label;
   document.getElementById("voteA-indicators").textContent = indicatorsA.join(" ");

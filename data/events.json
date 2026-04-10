@@ -4,8 +4,10 @@
     "name": "Roll the Dice",
     "text": "A travelling gambler challenges the crown to a high-stakes wager. Fortune favours the bold — or does it?",
     "image": "🎲",
-    "tags": ["chance"],
-    "weight": 1.0,
+    "tags": [
+      "chance"
+    ],
+    "weight": 1,
     "repeatable": true,
     "choices": [
       {
@@ -14,8 +16,12 @@
         "effects": {},
         "roll": {
           "chance": 0.5,
-          "success": { "treasury": 100 },
-          "failure": { "treasury": -100 }
+          "success": {
+            "treasury": 100
+          },
+          "failure": {
+            "treasury": -100
+          }
         }
       },
       {
@@ -25,14 +31,16 @@
       }
     ]
   },
-
   {
     "id": "poor_harvest",
     "name": "The Failing Harvest",
     "text": "A poor harvest has left the granaries dangerously low.",
     "image": "🌾",
-    "tags": ["economic", "crisis"],
-    "weight": 1.0,
+    "tags": [
+      "economic",
+      "crisis"
+    ],
+    "weight": 1,
     "repeatable": false,
     "choices": [
       {
@@ -44,7 +52,9 @@
           "loyalty": -5,
           "treasury": 120
         },
-        "applyModifiers": ["drought"]
+        "applyModifiers": [
+          "drought"
+        ]
       },
       {
         "id": "ration_food",
@@ -57,18 +67,26 @@
       }
     ]
   },
-
   {
     "id": "tax_protests",
     "name": "Popular Unrest",
     "text": "Protests erupt over increased taxation.",
     "image": "✊",
-    "tags": ["political", "crisis"],
-    "weight": 1.0,
+    "tags": [
+      "political",
+      "crisis"
+    ],
+    "weight": 1,
     "repeatable": false,
     "requirements": {
-      "choicesMade": ["raise_taxes"],
-      "stats": { "happiness": { "lte": 40 } }
+      "choicesMade": [
+        "raise_taxes"
+      ],
+      "stats": {
+        "happiness": {
+          "lte": 40
+        }
+      }
     },
     "choices": [
       {
@@ -91,17 +109,23 @@
       }
     ]
   },
-
   {
     "id": "plague",
     "name": "The Plague",
     "text": "A deadly plague spreads through the countryside.",
     "image": "💀",
-    "tags": ["crisis", "health"],
+    "tags": [
+      "crisis",
+      "health"
+    ],
     "weight": 0.8,
     "repeatable": false,
     "requirements": {
-      "stats": { "prosperity": { "lte": 50 } }
+      "stats": {
+        "prosperity": {
+          "lte": 50
+        }
+      }
     },
     "choices": [
       {
@@ -123,17 +147,23 @@
       }
     ]
   },
-
   {
     "id": "rebellion",
     "name": "The Noble's Conspiracy",
     "text": "The nobles are plotting a rebellion against your rule!",
     "image": "⚔️",
-    "tags": ["military", "crisis"],
+    "tags": [
+      "military",
+      "crisis"
+    ],
     "weight": 0.9,
     "repeatable": false,
     "requirements": {
-      "stats": { "loyalty": { "lte": 30 } }
+      "stats": {
+        "loyalty": {
+          "lte": 30
+        }
+      }
     },
     "choices": [
       {
@@ -144,7 +174,9 @@
           "prosperity": 10,
           "happiness": -40
         },
-        "applyModifiers": ["war_tax"]
+        "applyModifiers": [
+          "war_tax"
+        ]
       },
       {
         "id": "negotiate_rebellion",
@@ -158,18 +190,26 @@
       }
     ]
   },
-
   {
     "id": "peace_treaty",
     "name": "Diplomatic Negotiations",
     "text": "Foreign diplomats arrive to negotiate a peace treaty.",
     "image": "🕊️",
-    "tags": ["diplomatic", "positive"],
-    "weight": 1.0,
+    "tags": [
+      "diplomatic",
+      "positive"
+    ],
+    "weight": 1,
     "repeatable": false,
     "requirements": {
-      "choicesMade": ["negotiate_rebellion"],
-      "stats": { "loyalty": { "gte": 20 } }
+      "choicesMade": [
+        "negotiate_rebellion"
+      ],
+      "stats": {
+        "loyalty": {
+          "gte": 20
+        }
+      }
     },
     "choices": [
       {
@@ -192,13 +232,14 @@
       }
     ]
   },
-
   {
     "id": "trade_dispute",
     "name": "The Merchant's Quarrel",
     "text": "Merchants are quarreling over trading rights in the kingdom.",
     "image": "⚖️",
-    "tags": ["economic"],
+    "tags": [
+      "economic"
+    ],
     "weight": 1.2,
     "repeatable": false,
     "choices": [
@@ -210,7 +251,9 @@
           "happiness": 10,
           "loyalty": -5
         },
-        "applyModifiers": ["trade_boom"]
+        "applyModifiers": [
+          "trade_boom"
+        ]
       },
       {
         "id": "impose_tariffs",
@@ -223,17 +266,23 @@
       }
     ]
   },
-
   {
     "id": "dragon_attack",
     "name": "The Dragon",
     "text": "A fearsome dragon has been spotted near the kingdom!",
     "image": "🐉",
-    "tags": ["military", "fantasy"],
+    "tags": [
+      "military",
+      "fantasy"
+    ],
     "weight": 0.7,
     "repeatable": false,
     "requirements": {
-      "stats": { "prosperity": { "gte": 40 } }
+      "stats": {
+        "prosperity": {
+          "gte": 40
+        }
+      }
     },
     "choices": [
       {
@@ -256,14 +305,16 @@
       }
     ]
   },
-
   {
     "id": "royal_marriage",
     "name": "A Royal Union",
     "text": "An opportunity for a royal marriage alliance has appeared.",
     "image": "💍",
-    "tags": ["diplomatic", "positive"],
-    "weight": 1.0,
+    "tags": [
+      "diplomatic",
+      "positive"
+    ],
+    "weight": 1,
     "repeatable": false,
     "choices": [
       {
@@ -287,17 +338,21 @@
       }
     ]
   },
-
   {
     "id": "allied_kingdom",
     "name": "Allies Offer Aid",
     "text": "Your new allies offer military support in troubled times.",
     "image": "🤝",
-    "tags": ["diplomatic", "positive"],
-    "weight": 1.0,
+    "tags": [
+      "diplomatic",
+      "positive"
+    ],
+    "weight": 1,
     "repeatable": false,
     "requirements": {
-      "choicesMade": ["arrange_marriage"]
+      "choicesMade": [
+        "arrange_marriage"
+      ]
     },
     "choices": [
       {
@@ -320,17 +375,23 @@
       }
     ]
   },
-
   {
     "id": "assassin_plot",
     "name": "Betrayal Within",
     "text": "An assassination plot against you has been uncovered!",
     "image": "🗡️",
-    "tags": ["political", "crisis"],
+    "tags": [
+      "political",
+      "crisis"
+    ],
     "weight": 0.9,
     "repeatable": false,
     "requirements": {
-      "stats": { "loyalty": { "lte": 45 } }
+      "stats": {
+        "loyalty": {
+          "lte": 45
+        }
+      }
     },
     "choices": [
       {
@@ -353,17 +414,21 @@
       }
     ]
   },
-
   {
     "id": "emils_WarTax_Test",
     "name": "Emil is doing a warTax test",
     "text": "Emil is trying to remove a permanent modifier.",
     "image": "🧪",
-    "tags": ["test", "crisis"],
+    "tags": [
+      "test",
+      "crisis"
+    ],
     "weight": 0.9,
     "repeatable": false,
     "requirements": {
-      "activeModifiers": ["war_tax"]
+      "activeModifiers": [
+        "war_tax"
+      ]
     },
     "choices": [
       {
@@ -374,7 +439,9 @@
           "happiness": 0,
           "prosperity": 0
         },
-        "removeModifiers": ["war_tax"]
+        "removeModifiers": [
+          "war_tax"
+        ]
       },
       {
         "id": "keep_the_tax",
@@ -387,13 +454,14 @@
       }
     ]
   },
-
   {
     "id": "emils_longText_Test",
     "name": "Emil is doing a long text test",
     "text": "Emil is trying to have a very long text. Like trhis hlkjsahjlkasf ljkfdsalkjhfsd lkjhdfslkjh fdllkjhfd lkjhfdslkjhfdsjlkh fds ljkfdsahljkfda lkjdsalkjf sdlkjh dsj vpoa vle ffljdska vchajlks flak chlakjdhf alkjsxch vsdkljahf dfvslkjhdgv adlkjs cvglksvg lkjdavgh dd.\nIt should also try with very lllllllllllllllloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooonnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnngggggggggggggggggggggggggggggggggggggggggggggggggggggggggg wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwooooooooooooooooooooooooooooooooooooooooooooooorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrdddddddddddddddddddddsssssssssssssss",
     "image": "🧪",
-    "tags": ["test"],
+    "tags": [
+      "test"
+    ],
     "weight": 0.9,
     "repeatable": false,
     "choices": [
@@ -417,14 +485,15 @@
       }
     ]
   },
-
-
   {
     "id": "emils_test",
     "name": "Emil is doing a test v1",
     "text": "Emil is trying various thingas to test the game, this is one of them.",
     "image": "🧪",
-    "tags": ["test", "crisis"],
+    "tags": [
+      "test",
+      "crisis"
+    ],
     "weight": 0.9,
     "repeatable": false,
     "choices": [
@@ -448,13 +517,15 @@
       }
     ]
   },
-
   {
     "id": "economic_boost",
     "name": "Economic Boom",
     "text": "A renowned merchant guild offers to restructure the kingdom's trade routes, promising lasting prosperity.",
     "image": "💹",
-    "tags": ["economic", "positive"],
+    "tags": [
+      "economic",
+      "positive"
+    ],
     "weight": 0.8,
     "repeatable": false,
     "choices": [
@@ -466,7 +537,9 @@
           "prosperity": 15,
           "happiness": 5
         },
-        "applyModifiers": ["economic_prosperity"]
+        "applyModifiers": [
+          "economic_prosperity"
+        ]
       },
       {
         "id": "decline_guild",
@@ -478,17 +551,23 @@
       }
     ]
   },
-
   {
     "id": "golden_harvest",
     "name": "Bountiful Years",
     "text": "The finest harvest in a generation blesses the kingdom!",
     "image": "🌻",
-    "tags": ["economic", "positive"],
+    "tags": [
+      "economic",
+      "positive"
+    ],
     "weight": 0.8,
     "repeatable": false,
     "requirements": {
-      "stats": { "prosperity": { "gte": 60 } }
+      "stats": {
+        "prosperity": {
+          "gte": 60
+        }
+      }
     },
     "choices": [
       {
@@ -499,7 +578,9 @@
           "loyalty": 20,
           "prosperity": -10
         },
-        "applyModifiers": ["festival_spirit"]
+        "applyModifiers": [
+          "festival_spirit"
+        ]
       },
       {
         "id": "stockpile_grain",
@@ -508,6 +589,34 @@
           "happiness": 5,
           "loyalty": 10,
           "prosperity": 15
+        }
+      }
+    ]
+  },
+  {
+    "id": "event_tree_test",
+    "name": "Event tree test",
+    "text": "This is to try and create an event via the eventtree.html",
+    "image": "👌",
+    "tags": [
+      "test"
+    ],
+    "weight": 1,
+    "repeatable": true,
+    "choices": [
+      {
+        "id": "don_t_do_the_test_you_will_get_drought",
+        "label": "Don't do the test, you will get drought",
+        "effects": {},
+        "applyModifiers": [
+          "drought"
+        ]
+      },
+      {
+        "id": "do_the_test_and_be_happy",
+        "label": "Do the test and be happy",
+        "effects": {
+          "happiness": 5
         }
       }
     ]

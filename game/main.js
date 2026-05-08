@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.voteCardClick = (choice) => vote(choice);
   window.decideCardClick = (choice) => decide(choice);
 
-  const kingNames = ["Neil", "Jonas", "Elias", "Kaka", "Harry", "Richard", "Sergei", "Julian", "Harold", "Geoffrey", "Roland", "Leopold", "Magnus", "Aldric", "Conrad", "Sigurd"];
+  const kingNames = ["Neil", "Jonas", "Elias", "Kaka", "Harry", "Richard", "Sergei", "Julian", "Magnus", "Fredrik", "Aldric", "Conrad", "Sigurd"];
   const queenNames = ["Eleanor", "Margaret", "Isabella", "Lily", "Vilma", "Adelaide", "Josse", "Astrid", "Beatrice", "Cecily", "Elspeth", "Guinevere", "Hildegard", "Isolde", "Rowena", "Seraphina", "Vivienne"];
 
   document.getElementById("randomNameBtn").onclick = () => {
@@ -182,7 +182,7 @@ function endVotingPhase() {
 
   setVotingPhase(false, state.votes);
   updateTimer(0);
-  log("Voting closed. The King must decide.");
+  log("The people have spoken. The King must decide.");
 }
 
 function vote(choice) {
@@ -247,8 +247,8 @@ function decide(choice) {
     }
     if (rollOutcome) {
       logMsg += rollOutcome === "success"
-        ? " The dice rolled in your favour!"
-        : " The dice were unkind.";
+        ? " The dice rolled in your favour! You rock!"
+        : " The dice were unkind. You fucking suck...";
     }
     if (penalty > 0) state.stats.loyalty -= penalty;
     log(logMsg);

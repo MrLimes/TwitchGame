@@ -620,5 +620,65 @@
         }
       }
     ]
+  },
+  {
+    "id": "the_fault_in_our_stars",
+    "name": "The fault in our stars",
+    "text": "One night, you stand on your balcony staring at the night sky.\n\nBut what is that? Did that star move a bit? You rub your eyes and look up again. The star is still there, but the star looks as unmoving as stars should.\n\nThe next day the city is buzzing with rumors and talks about the moving star. You were not the only one that saw the mystical event last night.\n\nBut what should you do? Your advisors cannot come to a conclusion. The people demand answers. A drop of sweat slowly slides down your back...",
+    "image": "⭐",
+    "tags": [],
+    "weight": 1,
+    "repeatable": false,
+    "choices": [
+      {
+        "id": "do_nothing_this_is_clearly_a_case_of_mass_hysteria",
+        "label": "Do nothing. This is clearly a case of mass hysteria",
+        "effects": {
+          "happiness": -20
+        }
+      },
+      {
+        "id": "build_an_astornomy_tower_to_keep_track_of_the_night_sky",
+        "label": "Build an astornomy tower to keep track of the night sky",
+        "effects": {
+          "happiness": 10,
+          "prosperity": -10,
+          "treasury": -100
+        },
+        "applyModifiers": [
+          "astronomy_tower"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "the_fault_in_one_star",
+    "name": "The fault in one star",
+    "text": "Since you first noticed the moving star, you have been paying closer attention to the night sky. Especially the star you thought was moving. You write your investment into the astronomy tower down to a loss until one day...\n\nYou leas astronomer, Kenny Starfighter, comes rushing into your courtroom. \"King, I have news\" he exclaims through rushed breath.\n\n\"The star IS moving. Every 100 days it moves a little bit. But what is even more interesting, it seems to grow as well\"\n\nSurprised by this news, your court once again descends into squabbling. No one knows what to do...",
+    "image": "📜",
+    "tags": [],
+    "weight": 1,
+    "repeatable": false,
+    "choices": [
+      {
+        "id": "further_fund_the_astronomy_tower",
+        "label": "Further fund the astronomy tower",
+        "effects": {
+          "happiness": 5,
+          "prosperity": -25,
+          "treasury": -100
+        }
+      },
+      {
+        "id": "do_nothing",
+        "label": "Do nothing",
+        "effects": {}
+      }
+    ],
+    "requirements": {
+      "activeModifiers": [
+        "astronomy_tower"
+      ]
+    }
   }
 ]

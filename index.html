@@ -94,6 +94,16 @@
       justify-content: center;
     }
 
+    .card-subtext {
+      padding: 6px 12px 4px;
+      font-size: 0.8em;
+      color: #aaa;
+      font-style: italic;
+      line-height: 1.4;
+      display: none;
+    }
+    .card-subtext.visible { display: block; }
+
     .card-indicators {
       background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
       border-top: 2px solid #444;
@@ -567,10 +577,12 @@
   <div class="row">
     <div class="card-button" id="voteCardA" onclick="window.voteCardClick(0)">
       <div class="card-title" id="voteA-title"></div>
+      <div class="card-subtext" id="voteA-subtext"></div>
       <div class="card-indicators" id="voteA-indicators"></div>
     </div>
     <div class="card-button" id="voteCardB" onclick="window.voteCardClick(1)">
       <div class="card-title" id="voteB-title"></div>
+      <div class="card-subtext" id="voteB-subtext"></div>
       <div class="card-indicators" id="voteB-indicators"></div>
     </div>
   </div>
@@ -589,10 +601,12 @@
     <div class="row">
       <div class="card-button" id="kingCardA" onclick="window.decideCardClick(0)">
         <div class="card-title" id="kingA-title"></div>
+        <div class="card-subtext" id="kingA-subtext"></div>
         <div class="card-indicators" id="kingA-indicators"></div>
       </div>
       <div class="card-button" id="kingCardB" onclick="window.decideCardClick(1)">
         <div class="card-title" id="kingB-title"></div>
+        <div class="card-subtext" id="kingB-subtext"></div>
         <div class="card-indicators" id="kingB-indicators"></div>
       </div>
     </div>

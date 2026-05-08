@@ -409,6 +409,33 @@
       pointer-events: none;
     }
     #toast.show { opacity: 1; }
+
+    .emoji-drop {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      background: #1e1e1e;
+      border: 1px solid #555;
+      border-radius: 6px;
+      padding: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      max-width: 240px;
+      z-index: 2000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+    }
+    .emoji-drop.hidden { display: none; }
+    .emoji-drop button {
+      background: none;
+      border: none;
+      font-size: 1.4em;
+      cursor: pointer;
+      padding: 3px 5px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+    .emoji-drop button:hover { background: #333; }
   </style>
 </head>
 <body>
@@ -449,9 +476,10 @@
 
       <!-- Basic info -->
       <div class="field-row">
-        <div class="field-group" style="flex:0 0 60px;">
+        <div class="field-group" style="flex:0 0 60px; position:relative;">
           <label>Image</label>
-          <input type="text" id="f-image" placeholder="🎲" maxlength="4" style="text-align:center;font-size:1.4em;padding:2px;" />
+          <input type="text" id="f-image" placeholder="🎲" style="text-align:center;font-size:1.4em;padding:2px;" autocomplete="off" />
+          <div id="emoji-drop" class="emoji-drop hidden"></div>
         </div>
         <div class="field-group">
           <label>Name *</label>
@@ -616,6 +644,10 @@ function makeChoiceCard(index) {
       <input type="text" class="c-label" placeholder="Raise taxes" />
     </div>
     <div class="field-group">
+      <label>Subtext (optional flavour)</label>
+      <input type="text" class="c-subtext" placeholder="The merchants won't be pleased..." />
+    </div>
+    <div class="field-group">
       <label>Choice ID (auto)</label>
       <input type="text" class="c-id" placeholder="raise_taxes" />
     </div>
@@ -727,6 +759,7 @@ function readForm() {
   document.querySelectorAll('.choice-card').forEach(card => {
     const label = card.querySelector('.c-label').value.trim();
     if (!label) return;
+    const subtext = card.querySelector('.c-subtext').value.trim() || null;
     const choiceId = card.querySelector('.c-id').value.trim() || toSnake(label);
     const effects = {
       happiness:  parseInt(card.querySelector('.c-happiness').value, 10) || 0,
@@ -741,7 +774,7 @@ function readForm() {
     const applyMods = card.querySelector('.c-apply-mods').value.split(',').map(s=>s.trim()).filter(Boolean);
     const removeMods = card.querySelector('.c-remove-mods').value.split(',').map(s=>s.trim()).filter(Boolean);
 
-    const choice = { id: choiceId, label, effects };
+    const choice = { id: choiceId, label, ...(subtext && { subtext }), effects };
     if (followUp) choice.followUp = followUp;
     if (applyMods.length) choice.applyModifiers = applyMods;
     if (removeMods.length) choice.removeModifiers = removeMods;
@@ -789,6 +822,7 @@ function fillForm(ev) {
   (ev.choices || []).forEach((c, i) => {
     const card = makeChoiceCard(i + 1);
     card.querySelector('.c-label').value = c.label || '';
+    card.querySelector('.c-subtext').value = c.subtext || '';
     card.querySelector('.c-id').value = c.id || '';
     card.querySelector('.c-happiness').value = c.effects?.happiness ?? 0;
     card.querySelector('.c-prosperity').value = c.effects?.prosperity ?? 0;
@@ -836,7 +870,7 @@ async function init() {
     return {
       id: ev.id,
       label: (ev.image ? ev.image + '\n' : '') + ev.name,
-      title: buildTooltip(ev),
+      _tooltip: buildTooltip(ev),
       color: { background: col + '22', border: col, highlight: { background: col + '55', border: col } },
       font: { color: '#eee', size: 13 },
       shape: 'box',
@@ -950,7 +984,7 @@ async function init() {
       forceAtlas2Based: { gravitationalConstant: -60, centralGravity: 0.005, springLength: 180, springConstant: 0.08, damping: 0.6 },
       stabilization: { iterations: 200 },
     },
-    interaction: { hover: true, tooltipDelay: 100, navigationButtons: true, keyboard: true },
+    interaction: { hover: true, tooltipDelay: 100, navigationButtons: true, keyboard: { bindToWindow: false } },
     edges: { width: 1.5, selectionWidth: 3 },
     nodes: { margin: 10 },
   });
@@ -961,16 +995,38 @@ async function init() {
     const node = nodeList.find(n => n.id === params.node);
     if (!node || node._type === 'modifier') return;
     const pos = params.event.center;
-    tooltip.innerHTML = node.title || '';
+    tooltip.innerHTML = node._tooltip || '';
     tooltip.style.display = 'block';
     tooltip.style.left = (pos.x + 16) + 'px';
     tooltip.style.top  = (pos.y + 16) + 'px';
   });
   network.on('blurNode', () => { tooltip.style.display = 'none'; });
   network.on('dragStart', () => { tooltip.style.display = 'none'; });
+  const LAYOUT_KEY = 'event-tree-layout';
+
+  function saveLayout() {
+    const positions = network.getPositions();
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(positions));
+  }
+
+  function loadLayout() {
+    try { return JSON.parse(localStorage.getItem(LAYOUT_KEY)) || {}; } catch { return {}; }
+  }
+
+  function applyLayout(positions) {
+    const updates = Object.entries(positions)
+      .filter(([id]) => nodes.get(id))
+      .map(([id, pos]) => ({ id, x: pos.x, y: pos.y }));
+    if (updates.length) nodes.update(updates);
+  }
+
   network.on('stabilizationIterationsDone', () => {
     network.setOptions({ physics: { enabled: false } });
+    const saved = loadLayout();
+    if (Object.keys(saved).length) applyLayout(saved);
   });
+
+  network.on('dragEnd', () => saveLayout());
 
   // Reset view
   document.getElementById('resetBtn').onclick = () => {
@@ -1056,7 +1112,7 @@ async function init() {
 
       // Update node label/tooltip
       const updatedNode = buildEventNode(ev);
-      nodes.update({ id: ev.id, label: updatedNode.label, title: updatedNode.title, color: updatedNode.color, _tags: updatedNode._tags, _name: updatedNode._name });
+      nodes.update({ id: ev.id, label: updatedNode.label, _tooltip: updatedNode._tooltip, color: updatedNode.color, _tags: updatedNode._tags, _name: updatedNode._name });
 
       // Remove old edges from this node and rebuild
       const oldEdgeIds = edges.get({ filter: e => e.from === ev.id || (e.to === ev.id && e._type !== 'requires') }).map(e => e.id);
@@ -1128,6 +1184,115 @@ init().catch(err => {
       Make sure you're running via a local server.
     </div>`;
 });
+
+// Emoji picker for f-image
+(function() {
+  const EMOJI_DB = [
+    { e: '⚔️', k: 'sword war battle fight attack weapon' },
+    { e: '🛡️', k: 'shield defense protect guard' },
+    { e: '👑', k: 'crown king queen royal ruler loyalty' },
+    { e: '🏰', k: 'castle fortress kingdom palace' },
+    { e: '🎲', k: 'dice random chance gamble luck' },
+    { e: '🌾', k: 'harvest farm grain wheat food crop famine' },
+    { e: '✊', k: 'fist revolt rebel uprising protest anger' },
+    { e: '💀', k: 'skull death plague disease dead poison murder' },
+    { e: '🕊️', k: 'dove peace truce diplomacy negotiate' },
+    { e: '⚖️', k: 'scales justice law judge balance court' },
+    { e: '🐉', k: 'dragon monster beast creature fantasy' },
+    { e: '💍', k: 'ring marriage wedding alliance engagement' },
+    { e: '🤝', k: 'handshake deal alliance agreement treaty trade' },
+    { e: '🗡️', k: 'dagger knife assassin murder stab weapon' },
+    { e: '🧪', k: 'potion alchemy magic brew experiment poison flask' },
+    { e: '💹', k: 'chart economy market trade gold prosperity' },
+    { e: '🌻', k: 'sunflower harvest nature flower bloom' },
+    { e: '🔥', k: 'fire burn war attack destruction raid' },
+    { e: '❄️', k: 'ice cold winter freeze blizzard snow' },
+    { e: '⛵', k: 'ship fleet sail navy sea trade merchant' },
+    { e: '🏹', k: 'bow arrow archer hunt battle attack' },
+    { e: '🐴', k: 'horse cavalry mount ride war knight' },
+    { e: '🗺️', k: 'map territory explore expedition land' },
+    { e: '⛏️', k: 'pick mine quarry resource labor dig' },
+    { e: '📜', k: 'scroll law decree document treaty edict letter' },
+    { e: '🪙', k: 'coin gold treasury money tax bribe wealth' },
+    { e: '😊', k: 'smile happy happiness joy celebration' },
+    { e: '😔', k: 'sad unhappy grief mourn sorrow' },
+    { e: '😡', k: 'angry rage fury riot rebel' },
+    { e: '🎭', k: 'theater festival celebration entertainment performance play' },
+    { e: '🎁', k: 'gift tribute offer present bribe' },
+    { e: '🔔', k: 'bell announce news herald alarm' },
+    { e: '⚡', k: 'lightning storm disaster fast power' },
+    { e: '🌊', k: 'flood wave water river sea disaster' },
+    { e: '🌋', k: 'volcano eruption disaster destruction' },
+    { e: '⛪', k: 'church religion faith temple pray god' },
+    { e: '🙏', k: 'pray religion blessing faith beg mercy' },
+    { e: '🧙', k: 'wizard mage magic sorcerer spell witch' },
+    { e: '🕵️', k: 'spy assassin secret infiltrate espionage' },
+    { e: '👀', k: 'spy watch secret observe suspicious' },
+    { e: '🌿', k: 'herb nature forest druid healing poison' },
+    { e: '🍷', k: 'wine feast banquet celebration drink poison' },
+    { e: '🐍', k: 'snake poison treachery betrayal deception' },
+    { e: '🐺', k: 'wolf threat attack beast howl' },
+    { e: '🦅', k: 'eagle symbol majesty empire power' },
+    { e: '🦁', k: 'lion courage strength noble king' },
+    { e: '🧱', k: 'wall fortify defense build barrier' },
+    { e: '🚩', k: 'flag conquest territory banner claim' },
+    { e: '🔮', k: 'crystal magic prophecy foresee omen oracle' },
+    { e: '🏆', k: 'trophy victory win conquest triumph' },
+    { e: '💔', k: 'broken heart betrayal loss grief tragedy' },
+    { e: '❤️', k: 'heart love marriage loyalty ally' },
+    { e: '🩸', k: 'blood wound battle sacrifice death' },
+    { e: '⭐', k: 'star omen blessing fame hero' },
+    { e: '🎖️', k: 'medal honor war victory award' },
+    { e: '🪖', k: 'helmet soldier army war military' },
+    { e: '🏘️', k: 'village town people settlement raid' },
+    { e: '⛺', k: 'camp siege army expedition military' },
+    { e: '⚜️', k: 'fleur noble symbol royal heraldry' },
+    { e: '🌹', k: 'rose romance marriage beauty alliance' },
+    { e: '🍞', k: 'bread food famine peasant hunger' },
+    { e: '🐄', k: 'cow livestock farm wealth food' },
+    { e: '⚙️', k: 'gear mechanism technology work craft' },
+    { e: '🪤', k: 'trap ambush deception snare scheme' },
+    { e: '📈', k: 'rise prosperity growth progress economy' },
+    { e: '📉', k: 'decline fall crisis loss economy' },
+    { e: '🌍', k: 'world kingdom empire land territory' },
+    { e: '🎯', k: 'target plan goal assassin aim' },
+    { e: '🔑', k: 'key secret unlock access power' },
+    { e: '🔒', k: 'lock secret prison security captive' },
+    { e: '🤴', k: 'prince heir noble royal kingdom' },
+    { e: '👸', k: 'princess heir noble royal marriage' },
+    { e: '💣', k: 'bomb explosion attack siege destroy' },
+    { e: '🌑', k: 'moon dark night eclipse omen' },
+    { e: '☀️', k: 'sun good blessing harvest summer' },
+    { e: '🛤️', k: 'road travel expedition trade path' },
+  ];
+
+  const input = document.getElementById('f-image');
+  const drop = document.getElementById('emoji-drop');
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q || /\p{Emoji}/u.test(q)) { drop.classList.add('hidden'); return; }
+    const matches = EMOJI_DB.filter(r => r.k.split(' ').some(w => w.startsWith(q))).slice(0, 20);
+    if (!matches.length) { drop.classList.add('hidden'); return; }
+    drop.innerHTML = '';
+    matches.forEach(({ e, k }) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = e;
+      btn.title = k.split(' ')[0];
+      btn.addEventListener('mousedown', ev => {
+        ev.preventDefault();
+        input.value = e;
+        drop.classList.add('hidden');
+      });
+      drop.appendChild(btn);
+    });
+    drop.classList.remove('hidden');
+  });
+
+  input.addEventListener('blur', () => { setTimeout(() => drop.classList.add('hidden'), 150); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') drop.classList.add('hidden'); });
+})();
 </script>
 </body>
 </html>

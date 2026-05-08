@@ -82,6 +82,16 @@ export function renderEvent(event) {
   document.getElementById("kingA-indicators").textContent = indicatorsA.join(" ");
   document.getElementById("kingB-title").textContent = choiceB.label;
   document.getElementById("kingB-indicators").textContent = indicatorsB.join(" ");
+
+  const setSubtext = (id, text) => {
+    const el = document.getElementById(id);
+    el.textContent = text || '';
+    el.classList.toggle('visible', !!text);
+  };
+  setSubtext("voteA-subtext", choiceA.subtext);
+  setSubtext("voteB-subtext", choiceB.subtext);
+  setSubtext("kingA-subtext", choiceA.subtext);
+  setSubtext("kingB-subtext", choiceB.subtext);
 }
 
 export function renderVotes(votes) {
@@ -162,11 +172,12 @@ export function renderModifiers(activeModifiers) {
     let effect;
     if (m.type === "tag_boost") {
       effect = `${m.tags.join("/")} treasury +${Math.round(m.percent * 100)}%`;
-    } else {
+    } else if (m.stat != null && m.amount != null) {
       const sign = m.amount > 0 ? "+" : "";
       effect = `${m.stat} ${sign}${m.amount}`;
     }
-    return `<span class="modifier-tag">${m.icon} ${m.label}: ${effect} (${dur})</span>`;
+    const effectStr = effect ? `: ${effect}` : '';
+    return `<span class="modifier-tag">${m.icon} ${m.label}${effectStr} (${dur})</span>`;
   }).join("");
 }
 

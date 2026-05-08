@@ -40,5 +40,11 @@
     "boostStat": "treasury",
     "percent": 0.1,
     "duration": null
+  },
+  {
+    "id": "astronomy_tower",
+    "label": "Build Astronomy tower",
+    "icon": "💹",
+    "duration": null
   }
 ]

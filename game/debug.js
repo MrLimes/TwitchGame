@@ -16,8 +16,58 @@ export function rebuildEventSelect(events) {
   hackEventSelect.value = current || events[0]?.id;
 }
 
+function makeDebugDraggable(el) {
+  const STORAGE_KEY = 'debug-panel-pos';
+  const saved = (() => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch { return null; } })();
+  if (saved) {
+    el.style.left = saved.left + 'px';
+    el.style.top = saved.top + 'px';
+    el.style.transform = 'none';
+  }
+
+  const handle = el.querySelector('summary');
+  let dragging = false, didDrag = false;
+  let startX, startY, origLeft, origTop;
+
+  handle.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    dragging = true;
+    didDrag = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    const rect = el.getBoundingClientRect();
+    origLeft = rect.left;
+    origTop = rect.top;
+    el.style.transform = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didDrag = true;
+    if (!didDrag) return;
+    el.style.left = Math.max(0, Math.min(window.innerWidth  - el.offsetWidth,  origLeft + dx)) + 'px';
+    el.style.top  = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, origTop  + dy)) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    if (didDrag) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: el.getBoundingClientRect().left, top: el.getBoundingClientRect().top }));
+    }
+  });
+
+  handle.addEventListener('click', e => {
+    if (didDrag) { e.preventDefault(); didDrag = false; }
+  });
+}
+
 export function initDebug({ events, modifierDefs, endVotingPhase, startVotingPhase }) {
   const hackEventSelect = document.getElementById("hackEventSelect");
+  makeDebugDraggable(document.getElementById("debugPanel"));
 
   rebuildEventSelect(events);
   document.getElementById("debugPanel").addEventListener("toggle", () => {

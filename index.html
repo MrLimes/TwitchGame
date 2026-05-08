@@ -11,21 +11,104 @@
       color: #eee;
       max-width: 800px;
       margin: auto;
-      padding: 20px;
+      padding: 80px 20px 20px;
     }
 
-    h1, h2 {
+    h2 { text-align: center; }
+
+    #topBar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #111;
+      border-bottom: 2px solid #2a2a2a;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      height: 64px;
+      gap: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+
+    #topBar-name {
+      flex-shrink: 0;
+      min-width: 130px;
+    }
+
+    #topBar-name .tb-label {
+      font-size: 0.65em;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    #topBar-name #rulerHeading {
+      font-size: 0.95em;
+      font-weight: bold;
+      color: #ffd700;
+      text-align: left;
+      margin: 0;
+    }
+
+    #topBar-stats {
+      flex: 0 0 33%;
+      max-width: 33%;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .tb-stat { flex: 1; }
+
+    .tb-stat-label {
+      font-size: 0.65em;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+
+    .tb-bar {
+      position: relative;
+      background: #333;
+      height: 16px;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .tb-fill { height: 100%; transition: width 0.4s ease; }
+
+    .tb-bar-value {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 0.68em;
+      line-height: 16px;
+      font-family: monospace;
+      text-shadow: 0 0 2px rgba(0,0,0,0.9);
+      pointer-events: none;
+      width: 100%;
       text-align: center;
     }
 
-    .stats {
+    #topBar-info {
+      flex-shrink: 0;
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
     }
 
-    .stat {
-      flex: 1;
+    #topBar-treasury {
+      font-size: 0.95em;
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    #topBar-age {
+      font-size: 0.75em;
+      color: #aaa;
     }
 
     .bar {
@@ -540,23 +623,30 @@
 </head>
 
 <body>
-  <h1>👑 The King & The People</h1>
-  <h2 id="rulerHeading" style="text-align:center; color:#ffd700; font-size:1em; margin-top:-10px; margin-bottom:14px;"></h2>
-  <h2>Age: <span id="age"></span></h2>
-  <div class="treasury-display">🪙 <span class="treasury-emoji">Treasury:</span><span id="treasury-value"></span></div>
-
-  <div class="stats">
-    <div class="stat">
-      Happiness
-      <div class="bar"><div id="happiness" class="fill" style="background:#4caf50"></div><span id="happiness-value" class="bar-value"></span></div>
+  <div id="topBar">
+    <div id="topBar-name">
+      <div class="tb-label">Your Ruler</div>
+      <div style="display:flex; align-items:baseline; gap:8px;">
+        <h2 id="rulerHeading"></h2>
+        <div id="topBar-age">Age: <span id="age"></span></div>
+      </div>
     </div>
-    <div class="stat">
-      Prosperity
-      <div class="bar"><div id="prosperity" class="fill" style="background:#2196f3"></div><span id="prosperity-value" class="bar-value"></span></div>
+    <div id="topBar-stats">
+      <div class="tb-stat">
+        <div class="tb-stat-label">😊 Happiness</div>
+        <div class="tb-bar"><div id="happiness" class="tb-fill" style="background:#4caf50"></div><span id="happiness-value" class="tb-bar-value"></span></div>
+      </div>
+      <div class="tb-stat">
+        <div class="tb-stat-label">📈 Prosperity</div>
+        <div class="tb-bar"><div id="prosperity" class="tb-fill" style="background:#2196f3"></div><span id="prosperity-value" class="tb-bar-value"></span></div>
+      </div>
+      <div class="tb-stat">
+        <div class="tb-stat-label">👑 Loyalty</div>
+        <div class="tb-bar"><div id="loyalty" class="tb-fill" style="background:#ff9800"></div><span id="loyalty-value" class="tb-bar-value"></span></div>
+      </div>
     </div>
-    <div class="stat">
-      Loyalty
-      <div class="bar"><div id="loyalty" class="fill" style="background:#ff9800"></div><span id="loyalty-value" class="bar-value"></span></div>
+    <div id="topBar-info">
+      <div id="topBar-treasury">🪙 <span id="treasury-value"></span></div>
     </div>
   </div>
 
@@ -615,7 +705,7 @@
   <div class="log" id="log"></div>
 
   <details id="debugPanel" style="position: fixed; left: 10px; top: 50%; transform: translateY(-50%); background: #1a1a1a; border: 1px solid #555; border-radius: 5px; padding: 6px 10px; z-index: 100; min-width: 140px;">
-    <summary style="cursor: pointer; color: #aaa; font-size: 0.85em; user-select: none;">🛠 Debug</summary>
+    <summary style="cursor: grab; color: #aaa; font-size: 0.85em; user-select: none;">🛠 Debug</summary>
     <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
       <button id="hackHappinessBtn" style="padding: 8px; background: #ff5722; color: white; border: none; border-radius: 5px; cursor: pointer;">Happiness -10</button>
       <button id="hackHappinessPlusBtn" style="padding: 8px; background: #ff5722; color: white; border: none; border-radius: 5px; cursor: pointer;">Happiness +10</button>
